@@ -1,18 +1,14 @@
-import withPWAInit from "@ducanh2912/next-pwa";
+import { withSerwistInit } from "@serwist/next";
 import type { NextConfig } from "next";
 
-const withPWA = withPWAInit({
-  dest: "public",
-  // PWA is disabled in development by default. 
-  // To test offline functionality, either run a production build or set this to false.
+const withSerwist = withSerwistInit({
+  swSrc: "src/sw.ts",
+  swDest: "public/sw.js",
+  // Disable PWA in development to avoid issues with Hot Module Replacement
   disable: process.env.NODE_ENV === "development",
   register: true,
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  fallbacks: {
-    document: "/",
-  },
+  // Cache pages on search or link hover
+  cacheOnNavigation: true,
 });
 
 const nextConfig: NextConfig = {
@@ -22,5 +18,4 @@ const nextConfig: NextConfig = {
   turbopack: {}
 };
 
-
-export default withPWA(nextConfig);
+export default withSerwist(nextConfig);
