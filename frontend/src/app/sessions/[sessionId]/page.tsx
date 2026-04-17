@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef, use } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import apiClient from "@/services/apiClient";
 import { Session, Participant, BillItem } from "@/features/session/types";
 import SessionErrorState from "@/features/session/components/SessionErrorState";
@@ -18,7 +18,6 @@ import {
   Pencil,
   ArrowLeft,
   ChevronDown,
-  QrCode,
   Smartphone,
   Copy,
   Check,
@@ -59,8 +58,6 @@ const t = {
   draft: "لسه بنجمع",
   calculated: "الحسبة خلصت",
   settled: "كله دفع",
-  copyLink: "انسخ اللينك",
-  showQR: "شير الحسبة",
   notFound: "الحسبة دي مش لاقينها",
   tapToExpand: "دوس هنا عشان التفاصيل",
 };
@@ -124,17 +121,13 @@ const Section = ({
 };
 
 export default function SessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
-  const resolvedParams = use(params);
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get("token");
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   const [session, setSession] = useState<Session | null>(null);
   const [calculateResult, setCalculateResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isOrganizer, setIsOrganizer] = useState(false);
-  const [showQR, setShowQR] = useState(false);
   const [toast, setToast] = useState("");
   const [isCalculated, setIsCalculated] = useState(false);
   const [expanded, setExpanded] = useState<ExpandedSections>({
@@ -154,20 +147,23 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const [newCharge, setNewCharge] = useState({ amount: "" });
 
   useEffect(() => {
-    loadSession();
-  }, [resolvedParams.sessionId, token]);
+    params.then(p => {
+      setSessionId(p.sessionId);
+    });
+  }, [params]);
+
+  useEffect(() => {
+    if (sessionId) {
+      loadSession();
+    }
+  }, [sessionId]);
 
   const loadSession = async () => {
+    if (!sessionId) return;
     try {
-      const endpoint = token
-        ? `/api/sessions/${resolvedParams.sessionId}?viewerToken=${token}`
-        : `/api/sessions/${resolvedParams.sessionId}`;
-
+      const endpoint = `/api/sessions/${sessionId}`;
       const data = await apiClient<Session>(endpoint);
       setSession(data);
-
-      const hasOrganizerToken = !!(token && token.startsWith("org_"));
-      setIsOrganizer(hasOrganizerToken);
       setIsCalculated(data.status === "Calculated" || data.status === "Settled");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load session");
@@ -191,37 +187,16 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
-  const handleShowQR = () => {
-    if (!session) return;
-    const viewerToken = session.viewerToken;
-    if (viewerToken) {
-      setShowQR(true);
-    } else {
-      copyLink();
-    }
-  };
-
-  const copyLink = async () => {
-    if (!session) return;
-    const viewerToken = session.viewerToken;
-    const url = viewerToken
-      ? `${window.location.origin}/sessions/${session.sessionId}?token=${viewerToken}`
-      : `${window.location.origin}/sessions/${session.sessionId}`;
-    await navigator.clipboard.writeText(url);
-    showToast("اللينك اتنسخ!");
-  };
-
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 2500);
   };
 
   const calculateSession = async () => {
-    if (!isOrganizer || !token) return;
+    if (!sessionId) return;
     try {
-      const result = await apiClient<any>(`/api/sessions/${resolvedParams.sessionId}/calculate`, {
+      const result = await apiClient<any>(`/api/sessions/${sessionId}/calculate`, {
         method: "POST",
-        organizerToken: token,
       });
       setCalculateResult(result);
       setIsCalculated(true);
@@ -233,26 +208,25 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const replacePayments = async (payments: { participantId: string; paidAmount: string }[]) => {
-    if (!isOrganizer || !token) return;
+    if (!sessionId) return;
     try {
-      await apiClient<void>(`/api/sessions/${resolvedParams.sessionId}/payments`, {
+      await apiClient<void>(`/api/sessions/${sessionId}/payments`, {
         method: "PUT",
         body: { payments },
-        organizerToken: token,
       });
       await loadSession();
+      showToast("اتسجلت تمام ✅");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save payments");
     }
   };
 
   const addParticipant = async () => {
-    if (!isOrganizer || !token || !newParticipantName.trim()) return;
+    if (!sessionId || !newParticipantName.trim()) return;
     try {
-      await apiClient<Participant>(`/api/sessions/${resolvedParams.sessionId}/participants`, {
+      await apiClient<Participant>(`/api/sessions/${sessionId}/participants`, {
         method: "POST",
         body: { displayName: newParticipantName },
-        organizerToken: token,
       });
       setNewParticipantName("");
       await loadSession();
@@ -262,12 +236,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const updateParticipant = async (participantId: string) => {
-    if (!isOrganizer || !token || !editParticipantName.trim()) return;
+    if (!sessionId || !editParticipantName.trim()) return;
     try {
-      await apiClient<Participant>(`/api/sessions/${resolvedParams.sessionId}/participants/${participantId}`, {
+      await apiClient<Participant>(`/api/sessions/${sessionId}/participants/${participantId}`, {
         method: "PUT",
         body: { displayName: editParticipantName },
-        organizerToken: token,
       });
       setEditingParticipant(null);
       setEditParticipantName("");
@@ -278,12 +251,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const deleteParticipant = async (participantId: string) => {
-    if (!isOrganizer || !token) return;
+    if (!sessionId) return;
     if (!confirm("متأكد إنك عايز تشيل صاحبك ده؟")) return;
     try {
-      await apiClient<void>(`/api/sessions/${resolvedParams.sessionId}/participants/${participantId}`, {
+      await apiClient<void>(`/api/sessions/${sessionId}/participants/${participantId}`, {
         method: "DELETE",
-        organizerToken: token,
       });
       await loadSession();
     } catch (err) {
@@ -292,16 +264,15 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const addItem = async () => {
-    if (!isOrganizer || !token || !newItem.name || !newItem.amount || !newItem.participantId) return;
+    if (!sessionId || !newItem.name || !newItem.amount || !newItem.participantId) return;
     try {
-      await apiClient<BillItem>(`/api/sessions/${resolvedParams.sessionId}/items`, {
+      await apiClient<BillItem>(`/api/sessions/${sessionId}/items`, {
         method: "POST",
         body: {
           name: newItem.name,
           amount: newItem.amount,
           assignments: [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }]
         },
-        organizerToken: token,
       });
       setNewItem({ name: "", amount: "", participantId: "" });
       await loadSession();
@@ -311,12 +282,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const deleteItem = async (itemId: string) => {
-    if (!isOrganizer || !token) return;
+    if (!sessionId) return;
     if (!confirm("متأكد إنك عايز تحذف الطلب ده؟")) return;
     try {
-      await apiClient<void>(`/api/sessions/${resolvedParams.sessionId}/items/${itemId}`, {
+      await apiClient<void>(`/api/sessions/${sessionId}/items/${itemId}`, {
         method: "DELETE",
-        organizerToken: token,
       });
       await loadSession();
     } catch (err) {
@@ -325,12 +295,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const addCharge = async () => {
-    if (!isOrganizer || !token || !newCharge.amount) return;
+    if (!sessionId || !newCharge.amount) return;
     try {
-      await apiClient<void>(`/api/sessions/${resolvedParams.sessionId}/charges`, {
+      await apiClient<void>(`/api/sessions/${sessionId}/charges`, {
         method: "PUT",
         body: { charges: [{ type: "both", amount: newCharge.amount }] },
-        organizerToken: token,
       });
       setNewCharge({ amount: "" });
       await loadSession();
@@ -366,10 +335,6 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   }
 
   const numParticipants = session.participants.length || 1;
-  const viewerToken = session.viewerToken;
-  const shareUrl = viewerToken ? `${typeof window !== 'undefined' ? window.location.origin : ''}/sessions/${session.sessionId}?token=${viewerToken}` : '';
-
-
 
   return (
     <div className="arabic-container">
@@ -378,9 +343,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           <ArrowLeft size={20} />
         </button>
         <h1>{session.name || t.appName}</h1>
-        <button className="header-icon" onClick={handleShowQR} aria-label={t.showQR}>
-          <QrCode size={20} />
-        </button>
+        <div style={{ width: 40 }} />
       </header>
 
       <div className="status-badge" data-status={session.status}>
@@ -399,8 +362,6 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
       {toast && <div className="toast">{toast}</div>}
 
-      {showQR && shareUrl && <QRModal url={shareUrl} onClose={() => setShowQR(false)} onCopy={copyLink} />}
-
       <div className="session-main-content">
         {isCalculated && (
           <div className="summary-stats">
@@ -416,7 +377,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         )}
 
         <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
-          {isOrganizer && session.status === "Draft" && (
+          {session.status === "Draft" && (
             <div className="input-group">
               <input
                 type="text"
@@ -435,7 +396,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
               <ParticipantRow
                 key={p.participantId}
                 participant={p}
-                isOrganizer={isOrganizer}
+                isOrganizer={true}
                 isDraft={session.status === "Draft"}
                 editing={editingParticipant === p.participantId}
                 editName={editParticipantName}
@@ -456,7 +417,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         </Section>
 
         <Section title={t.items} sectionKey="items" icon={<UtensilsCrossed size={18} />} count={session.items.length} expandable isExpanded={expanded.items} isAnimating={animatingSection === "items"} onToggle={toggleSection}>
-          {isOrganizer && session.status === "Draft" && (
+          {session.status === "Draft" && (
             <>
               <div className="input-group">
                 <input
@@ -503,7 +464,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                   </div>
                   <div className="item-right">
                     <span className="amount">{item.amount}</span>
-                    {isOrganizer && session.status === "Draft" && (
+                    {session.status === "Draft" && (
                       <button className="delete-btn" onClick={() => deleteItem(item.itemId)}>
                         <X size={16} />
                       </button>
@@ -522,7 +483,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         </Section>
 
         <Section title={t.taxService} sectionKey="charges" icon={<Receipt size={18} />} count={session.charges.length} expandable isExpanded={expanded.charges} isAnimating={animatingSection === "charges"} onToggle={toggleSection}>
-          {isOrganizer && session.status === "Draft" && (
+          {session.status === "Draft" && (
             <div className="input-group">
               <input
                 type="number"
@@ -552,7 +513,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           </div>
         </Section>
 
-        {isOrganizer && session.status === "Draft" && session.participants.length > 0 && (
+        {session.status === "Draft" && session.participants.length > 0 && (
           <Section title={t.payments} sectionKey="payments" icon={<Banknote size={18} />} expandable isExpanded={expanded.payments} isAnimating={animatingSection === "payments"} onToggle={toggleSection}>
             <PaymentEditor
               participants={session.participants}
@@ -622,31 +583,21 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         )}
       </div>
 
-      {isOrganizer && (
-        <div className="action-area">
-          {session.status === "Draft" ? (
-            <button className="calculate-btn" onClick={calculateSession}>
-              حساب الحسبة
+      <div className="action-area">
+        {session.status === "Draft" ? (
+          <button className="calculate-btn" onClick={calculateSession}>
+            الحسبة
+          </button>
+        ) : (
+          <>
+            <button className="refresh-btn" onClick={loadSession}>
+              <RefreshCw size={18} />
+              <span>تحديث</span>
             </button>
-          ) : (
-            <>
-              <button className="refresh-btn" onClick={loadSession}>
-                <RefreshCw size={18} />
-                <span>تحديث</span>
-              </button>
-            </>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </div>
 
-
-      {showQR && (
-        <QRModal
-          url={shareUrl}
-          onClose={() => setShowQR(false)}
-          onCopy={copyLink}
-        />
-      )}
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
@@ -754,44 +705,5 @@ function PaymentEditor({
         {isLoading ? "..." : "حفظ"}
       </button>
     </form>
-  );
-}
-
-function QRModal({ url, onClose, onCopy }: { url: string; onClose: () => void; onCopy: () => void }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    import("qrcode").then(({ default: QRCode }) => {
-      if (canvasRef.current) {
-        QRCode.toCanvas(canvasRef.current, url, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: "#f5f0e8",
-            light: "#2d261e"
-          }
-        });
-      }
-    });
-  }, [url]);
-
-  return (
-    <div className="qr-modal-overlay" onClick={onClose}>
-      <div className="qr-modal" onClick={e => e.stopPropagation()}>
-        <div className="qr-header">
-          <Smartphone size={24} />
-          <h3>امسح للدخول</h3>
-        </div>
-        <canvas ref={canvasRef}></canvas>
-        <div className="qr-url">{url}</div>
-        <div className="qr-actions">
-          <button className="qr-copy-btn" onClick={onCopy}>
-            <Copy size={18} />
-            <span>نسخ الرابط</span>
-          </button>
-          <button className="qr-close-btn" onClick={onClose}>إغلاق</button>
-        </div>
-      </div>
-    </div>
   );
 }

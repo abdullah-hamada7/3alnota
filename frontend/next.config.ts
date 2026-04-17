@@ -1,8 +1,18 @@
-import type { NextConfig } from 'next'
+import withPWAInit from "@ducanh2912/next-pwa";
+import type { NextConfig } from "next";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+});
 
 const nextConfig: NextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-}
+  // Silence Turbopack/Webpack compatibility error in Next.js 16+
+  // @ts-ignore - Turbopack key might not be in the type definition yet
+  turbopack: {}
+};
 
-export default nextConfig
+export default withPWA(nextConfig);

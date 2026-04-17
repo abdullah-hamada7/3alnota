@@ -1,16 +1,28 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'عالنوتة - قسّم وصفي الحساب بسهولة',
   description: 'عالنوتة هو أسهل طريقة لتقسيم الحسبة مع صحابك. سجّل الطلبات، وزّع المبالغ، وصفي الحساب بوضوح ومن غير لخبطة!',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    title: 'عالنوتة',
+    statusBarStyle: 'default',
+    capable: true,
+  },
   openGraph: {
     title: 'عالنوتة - 3al Nota',
     description: 'أسهل طريقة لتقسيم الحسبة مع صحابك. بوضوح ومن غير لخبطة!',
     type: 'website',
     locale: 'ar_EG',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#10b981',
 };
 
 export default function RootLayout({
@@ -27,10 +39,26 @@ export default function RootLayout({
       </head>
       <body>
         <div className="mobile-container">
-          {children}
+          <main className="flex-grow">
+            {children}
+          </main>
           <footer className="app-footer">
-            <p>عالنوتة</p>
-            <p className="credit">Created by Abdullah Hamada</p>
+            <div className="footer-content">
+              <div className="footer-links">
+                <a 
+                  href="https://forms.gle/your-feedback-form" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="feedback-link"
+                >
+                  قولنا رأيك ✨
+                </a>
+              </div>
+              <div className="footer-branding">
+                <p className="app-name">عالنوتة</p>
+                <p className="credit">© {new Date().getFullYear()} Abdullah Hamada</p>
+              </div>
+            </div>
           </footer>
         </div>
       </body>
