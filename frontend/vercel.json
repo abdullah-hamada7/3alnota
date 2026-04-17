@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "next build --webpack",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["fra1"]
+}

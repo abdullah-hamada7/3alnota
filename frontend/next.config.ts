@@ -8,11 +8,11 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
   reactStrictMode: true,
   // Silence Turbopack/Webpack compatibility error in Next.js 16+
   // @ts-ignore - Turbopack key might not be in the type definition yet
   turbopack: {}
 };
+
 
 export default withPWA(nextConfig);
