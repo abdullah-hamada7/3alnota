@@ -46,7 +46,7 @@ const SessionErrorState: React.FC<SessionErrorStateProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="error-state-container premium-entrance">
       <div className="mb-6 select-none">
         {content.icon}
       </div>

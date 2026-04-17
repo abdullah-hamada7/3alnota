@@ -94,7 +94,7 @@ const Section = ({
   onToggle: (key: keyof ExpandedSections) => void;
 }) => {
   return (
-    <section className={`content-section collapsible ${isExpanded ? 'expanded' : 'collapsed'} ${isAnimating ? 'animating' : ''}`}>
+    <section className={`content-section collapsible ${isExpanded ? 'expanded' : 'collapsed'} ${isAnimating ? 'animating' : ''} ${sectionKey}`}>
       <button
         className="section-header"
         onClick={() => expandable && onToggle(sectionKey)}
@@ -366,206 +366,218 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           </div>
         )}
 
-        <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
-          {session.status === "Draft" && (
-            <div className="input-group">
-              <input
-                type="text"
-                value={newParticipantName}
-                onChange={(e) => setNewParticipantName(e.target.value)}
-                placeholder={t.participantName}
-              />
-              <button className="add-btn" onClick={addParticipant}>
-                <Plus size={20} />
-              </button>
-            </div>
-          )}
-
-          <div className="list">
-            {session.participants.map(p => (
-              <ParticipantRow
-                key={p.participantId}
-                participant={p}
-                isOrganizer={true}
-                isDraft={session.status === "Draft"}
-                editing={editingParticipant === p.participantId}
-                editName={editParticipantName}
-                onEditNameChange={setEditParticipantName}
-                onStartEdit={() => { setEditingParticipant(p.participantId); setEditParticipantName(p.displayName); }}
-                onSaveEdit={() => updateParticipant(p.participantId)}
-                onCancelEdit={() => setEditingParticipant(null)}
-                onDelete={() => deleteParticipant(p.participantId)}
-              />
-            ))}
-            {session.participants.length === 0 && (
-              <div className="empty-state">
-                <p>{t.noParticipants}</p>
-                <span className="empty-hint">{t.addFirstParticipant}</span>
-              </div>
-            )}
-          </div>
-        </Section>
-
-        <Section title={t.items} sectionKey="items" icon={<UtensilsCrossed size={18} />} count={session.items.length} expandable isExpanded={expanded.items} isAnimating={animatingSection === "items"} onToggle={toggleSection}>
-          {session.status === "Draft" && (
-            <>
+        <div className="stagger-1">
+          <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
+            {session.status === "Draft" && (
               <div className="input-group">
                 <input
                   type="text"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                  placeholder={t.itemName}
-                  style={{ flex: 2 }}
+                  value={newParticipantName}
+                  onChange={(e) => setNewParticipantName(e.target.value)}
+                  placeholder={t.participantName}
                 />
-                <input
-                  type="number"
-                  value={newItem.amount}
-                  onChange={(e) => setNewItem({ ...newItem, amount: e.target.value })}
-                  placeholder="0"
-                  style={{ width: "80px" }}
-                />
-                <button className="add-btn" onClick={addItem} disabled={!newItem.participantId}>
+                <button className="add-btn" onClick={addParticipant}>
                   <Plus size={20} />
                 </button>
               </div>
-              <select
-                value={newItem.participantId}
-                onChange={(e) => setNewItem({ ...newItem, participantId: e.target.value })}
-                className="person-select"
-              >
-                <option value="">{t.selectPerson}</option>
-                {session.participants.map(p => (
-                  <option key={p.participantId} value={p.participantId}>{p.displayName}</option>
-                ))}
-              </select>
-            </>
-          )}
+            )}
 
-          <div className="list">
-            {session.items.map(item => {
-              const assignedTo = item.assignments.map(a =>
-                session.participants.find(p => p.participantId === a.participantId)?.displayName
-              ).filter(Boolean).join("، ");
-              return (
-                <div key={item.itemId} className="item-row">
-                  <div className="item-info">
-                    <span className="item-name">{item.name}</span>
-                    <span className="item-assigned">← {assignedTo}</span>
-                  </div>
-                  <div className="item-right">
-                    <span className="amount">{item.amount}</span>
-                    {session.status === "Draft" && (
-                      <button className="delete-btn" onClick={() => deleteItem(item.itemId)}>
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
+            <div className="list">
+              {session.participants.map(p => (
+                <ParticipantRow
+                  key={p.participantId}
+                  participant={p}
+                  isOrganizer={true}
+                  isDraft={session.status === "Draft"}
+                  editing={editingParticipant === p.participantId}
+                  editName={editParticipantName}
+                  onEditNameChange={setEditParticipantName}
+                  onStartEdit={() => { setEditingParticipant(p.participantId); setEditParticipantName(p.displayName); }}
+                  onSaveEdit={() => updateParticipant(p.participantId)}
+                  onCancelEdit={() => setEditingParticipant(null)}
+                  onDelete={() => deleteParticipant(p.participantId)}
+                />
+              ))}
+              {session.participants.length === 0 && (
+                <div className="empty-state">
+                  <p>{t.noParticipants}</p>
+                  <span className="empty-hint">{t.addFirstParticipant}</span>
                 </div>
-              );
-            })}
-            {session.items.length === 0 && (
-              <div className="empty-state">
-                <p>{t.noItems}</p>
-                <span className="empty-hint">{t.addFirstItem}</span>
-              </div>
-            )}
-          </div>
-        </Section>
-
-        <Section title={t.taxService} sectionKey="charges" icon={<Receipt size={18} />} count={session.charges.length} expandable isExpanded={expanded.charges} isAnimating={animatingSection === "charges"} onToggle={toggleSection}>
-          {session.status === "Draft" && (
-            <div className="input-group">
-              <input
-                type="number"
-                value={newCharge.amount}
-                onChange={(e) => setNewCharge({ amount: e.target.value })}
-                placeholder={t.chargeAmount}
-              />
-              <button className="add-btn" onClick={addCharge}>
-                <Plus size={20} />
-              </button>
+              )}
             </div>
-          )}
-
-          <div className="list">
-            {session.charges.map(c => (
-              <div key={c.chargeId} className="list-item">
-                <span>{t.taxService}</span>
-                <span className="amount">{(parseFloat(c.amount) / numParticipants).toFixed(0)} {t.currency}</span>
-              </div>
-            ))}
-            {session.charges.length === 0 && (
-              <div className="empty-state">
-                <p>{t.noCharges}</p>
-                <span className="empty-hint">{t.addFirstCharge}</span>
-              </div>
-            )}
-          </div>
-        </Section>
-
-        {session.status === "Draft" && session.participants.length > 0 && (
-          <Section title={t.payments} sectionKey="payments" icon={<Banknote size={18} />} expandable isExpanded={expanded.payments} isAnimating={animatingSection === "payments"} onToggle={toggleSection}>
-            <PaymentEditor
-              participants={session.participants}
-              onSubmit={replacePayments}
-            />
           </Section>
-        )}
+        </div>
 
-        {isCalculated && (
-          <Section title="النتيجة" sectionKey="results" icon={<BarChart3 size={18} />} expandable isExpanded={expanded.results} isAnimating={animatingSection === "results"} onToggle={toggleSection}>
-            <div className="results-list">
-              {session.participants.map(p => {
-                const balance = parseFloat(p.balance);
+        <div className="stagger-2">
+          <Section title={t.items} sectionKey="items" icon={<UtensilsCrossed size={18} />} count={session.items.length} expandable isExpanded={expanded.items} isAnimating={animatingSection === "items"} onToggle={toggleSection}>
+            {session.status === "Draft" && (
+              <>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                    placeholder={t.itemName}
+                    style={{ flex: 2 }}
+                  />
+                  <input
+                    type="number"
+                    value={newItem.amount}
+                    onChange={(e) => setNewItem({ ...newItem, amount: e.target.value })}
+                    placeholder="0"
+                    style={{ width: "80px" }}
+                  />
+                  <button className="add-btn" onClick={addItem} disabled={!newItem.participantId}>
+                    <Plus size={20} />
+                  </button>
+                </div>
+                <select
+                  value={newItem.participantId}
+                  onChange={(e) => setNewItem({ ...newItem, participantId: e.target.value })}
+                  className="person-select"
+                >
+                  <option value="">{t.selectPerson}</option>
+                  {session.participants.map(p => (
+                    <option key={p.participantId} value={p.participantId}>{p.displayName}</option>
+                  ))}
+                </select>
+              </>
+            )}
+
+            <div className="list">
+              {session.items.map(item => {
+                const assignedTo = item.assignments.map(a =>
+                  session.participants.find(p => p.participantId === a.participantId)?.displayName
+                ).filter(Boolean).join("، ");
                 return (
-                  <div key={p.participantId} className={`result-card ${balance > 0 ? "positive" : balance < 0 ? "negative" : "neutral"}`}>
-                    <div className="result-name">{p.displayName}</div>
-                    <div className="result-details">
-                      <div>المجموع: <strong>{p.finalAmount} {t.currency}</strong></div>
-                      <div>مدفوع: {p.paidAmount} {t.currency}</div>
-                      <div className={`result-balance ${balance > 0 ? "gets-back" : balance < 0 ? "owes" : ""}`}>
-                        {balance > 0 ? (
-                          <>
-                            <Check size={14} />
-                            <span>ليه {balance.toFixed(0)}</span>
-                          </>
-                        ) : balance < 0 ? (
-                          <>
-                            <div className="dot" />
-                            <span>عليه {Math.abs(balance).toFixed(0)}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Check size={14} />
-                            <span>خلاص</span>
-                          </>
-                        )}
-                      </div>
+                  <div key={item.itemId} className="item-row hover-glow">
+                    <div className="item-info">
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-assigned">← {assignedTo}</span>
+                    </div>
+                    <div className="item-right">
+                      <span className="amount">{item.amount}</span>
+                      {session.status === "Draft" && (
+                        <button className="delete-btn" onClick={() => deleteItem(item.itemId)}>
+                          <X size={16} />
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
               })}
+              {session.items.length === 0 && (
+                <div className="empty-state">
+                  <p>{t.noItems}</p>
+                  <span className="empty-hint">{t.addFirstItem}</span>
+                </div>
+              )}
             </div>
           </Section>
+        </div>
+
+        <div className="stagger-3">
+          <Section title={t.taxService} sectionKey="charges" icon={<Receipt size={18} />} count={session.charges.length} expandable isExpanded={expanded.charges} isAnimating={animatingSection === "charges"} onToggle={toggleSection}>
+            {session.status === "Draft" && (
+              <div className="input-group">
+                <input
+                  type="number"
+                  value={newCharge.amount}
+                  onChange={(e) => setNewCharge({ amount: e.target.value })}
+                  placeholder={t.chargeAmount}
+                />
+                <button className="add-btn" onClick={addCharge}>
+                  <Plus size={20} />
+                </button>
+              </div>
+            )}
+
+            <div className="list">
+              {session.charges.map(c => (
+                <div key={c.chargeId} className="list-item hover-glow">
+                  <span>{t.taxService}</span>
+                  <span className="amount">{(parseFloat(c.amount) / numParticipants).toFixed(0)} {t.currency}</span>
+                </div>
+              ))}
+              {session.charges.length === 0 && (
+                <div className="empty-state">
+                  <p>{t.noCharges}</p>
+                  <span className="empty-hint">{t.addFirstCharge}</span>
+                </div>
+              )}
+            </div>
+          </Section>
+        </div>
+
+        {session.status === "Draft" && session.participants.length > 0 && (
+          <div className="stagger-4">
+            <Section title={t.payments} sectionKey="payments" icon={<Banknote size={18} />} expandable isExpanded={expanded.payments} isAnimating={animatingSection === "payments"} onToggle={toggleSection}>
+              <PaymentEditor
+                participants={session.participants}
+                onSubmit={replacePayments}
+              />
+            </Section>
+          </div>
+        )}
+
+        {isCalculated && (
+          <div className="stagger-4">
+            <Section title="النتيجة" sectionKey="results" icon={<BarChart3 size={18} />} expandable isExpanded={expanded.results} isAnimating={animatingSection === "results"} onToggle={toggleSection}>
+              <div className="results-list">
+                {session.participants.map(p => {
+                  const balance = parseFloat(p.balance);
+                  return (
+                    <div key={p.participantId} className={`result-card hover-glow ${balance > 0 ? "positive" : balance < 0 ? "negative" : "neutral"}`}>
+                      <div className="result-name">{p.displayName}</div>
+                      <div className="result-details">
+                        <div>المجموع: <strong>{p.finalAmount} {t.currency}</strong></div>
+                        <div>مدفوع: {p.paidAmount} {t.currency}</div>
+                        <div className={`result-balance ${balance > 0 ? "gets-back" : balance < 0 ? "owes" : ""}`}>
+                          {balance > 0 ? (
+                            <>
+                              <Check size={14} />
+                              <span>ليه {balance.toFixed(0)}</span>
+                            </>
+                          ) : balance < 0 ? (
+                            <>
+                              <div className="dot" />
+                              <span>عليه {Math.abs(balance).toFixed(0)}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Check size={14} />
+                              <span>خلاص</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          </div>
         )}
 
         {isCalculated && settlements.length > 0 && (
-          <Section title="التسوية" sectionKey="settlements" icon={<ArrowRightLeft size={18} />} expandable isExpanded={expanded.settlements} isAnimating={animatingSection === "settlements"} onToggle={toggleSection}>
-            <div className="settlements-list">
-              {settlements.map((s, idx) => {
-                const fromName = session.participants.find(p => p.participantId === s.fromParticipantId)?.displayName || "";
-                const toName = session.participants.find(p => p.participantId === s.toParticipantId)?.displayName || "";
-                return (
-                  <div key={idx} className="settlement-item">
-                    <span className="from">{fromName}</span>
-                    <ArrowLeft size={16} className="owes-arrow" />
-                    <span className="to">{toName}</span>
-                    <span className="amount">{s.amount.toFixed(0)} {t.currency}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </Section>
+          <div className="stagger-5">
+            <Section title="التسوية" sectionKey="settlements" icon={<ArrowRightLeft size={18} />} expandable isExpanded={expanded.settlements} isAnimating={animatingSection === "settlements"} onToggle={toggleSection}>
+              <div className="settlements-list">
+                {settlements.map((s, idx) => {
+                  const fromName = session.participants.find(p => p.participantId === s.fromParticipantId)?.displayName || "";
+                  const toName = session.participants.find(p => p.participantId === s.toParticipantId)?.displayName || "";
+                  return (
+                    <div key={idx} className="settlement-item hover-glow">
+                      <span className="from">{fromName}</span>
+                      <ArrowLeft size={16} className="owes-arrow" />
+                      <span className="to">{toName}</span>
+                      <span className="amount">{s.amount.toFixed(0)} {t.currency}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </Section>
+          </div>
         )}
 
         {isCalculated && settlements.length === 0 && (
@@ -611,7 +623,7 @@ function ParticipantRow({
   onDelete: () => void;
 }) {
   return (
-    <div className="participant-item">
+    <div className="participant-item hover-glow">
       {editing ? (
         <div className="edit-form">
           <input

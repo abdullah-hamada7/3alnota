@@ -39,10 +39,10 @@ export default function HistoryList() {
         <h2>آخر النوتات</h2>
       </div>
       <div className="history-list">
-        {sessions.map((session) => (
+        {sessions.map((session, index) => (
           <div
             key={session.sessionId}
-            className="history-item"
+            className={`history-item hover-glow stagger-${(index % 5) + 1}`}
             onClick={() => router.push(`/sessions/${session.sessionId}`)}
           >
             <div className="history-item-info">
@@ -103,8 +103,6 @@ export default function HistoryList() {
         }
         .history-item:hover {
           border-color: var(--primary-color);
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-sm);
         }
         .history-item-info {
           display: flex;

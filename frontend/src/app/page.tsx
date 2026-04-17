@@ -30,43 +30,45 @@ export default function HomePage() {
 
   return (
     <main className="home-container">
-      <div className="hero">
+      <div className="hero stagger-1">
         <div className="logo-mark">ن</div>
         <h1 className="brand-name">عالنوتة</h1>
         <p className="tagline">قسّم الحسبة وصفي حسابك مع صحابك بسهولة</p>
       </div>
 
-      <form onSubmit={handleCreateSession} className="create-form">
-        <div className="form-group">
-          <input
-            type="text"
-            className="name-input"
-            value={sessionName}
-            onChange={(e) => setSessionName(e.target.value)}
-            placeholder="قولنا الحسبة دي بتاعة إيه؟"
-            disabled={isLoading}
-          />
-        </div>
-
-        {error && (
-          <div className="form-error">
-            {error}
+      <div className="stagger-2">
+        <form onSubmit={handleCreateSession} className="create-form">
+          <div className="form-group">
+            <input
+              type="text"
+              className="name-input"
+              value={sessionName}
+              onChange={(e) => setSessionName(e.target.value)}
+              placeholder="قولنا الحسبة دي بتاعة إيه؟"
+              disabled={isLoading}
+            />
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="create-btn"
-        >
-          {isLoading ? "..." : (
-            <>
-              <PlusCircle size={20} />
-              <span>افتح النوتة</span>
-            </>
+          {error && (
+            <div className="form-error">
+              {error}
+            </div>
           )}
-        </button>
-      </form>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="create-btn"
+          >
+            {isLoading ? "..." : (
+              <>
+                <PlusCircle size={20} />
+                <span>افتح النوتة</span>
+              </>
+            )}
+          </button>
+        </form>
+      </div>
 
       <HistoryList />
 

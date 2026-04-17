@@ -129,27 +129,18 @@ html, body {
   transform: scale(0.96);
 }
 
-/* Content Section styling */
-.content-section {
-  margin-bottom: var(--space-md);
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--bg-elevated);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.content-section.collapsed .section-content {
-  display: none;
-}
-
-.content-section.expanded .section-content {
-  display: block;
-  animation: slideDown 0.3s ease;
-}
-
-.content-section.animating {
-  animation: pulse 0.3s ease;
+/* Premium Animations */
+@keyframes premiumEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 @keyframes slideDown {
@@ -168,7 +159,26 @@ html, body {
   50% { transform: scale(1.01); }
 }
 
-.section-header {
+.premium-entrance {
+  animation: premiumEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Content Section styling */
+.content-section {
+  margin-bottom: var(--space-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--bg-elevated);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: premiumEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
   width: 100%;
   display: flex;
   align-items: center;
@@ -462,12 +472,22 @@ html, body {
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-15px);
   }
   to {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.participant-item, .item-row, .list-item, .result-card, .settlement-item {
+  animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.hover-glow:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(201, 101, 58, 0.2);
+  transform: translateY(-2px);
 }
 
 .list-item .amount {
