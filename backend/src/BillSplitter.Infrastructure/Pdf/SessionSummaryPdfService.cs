@@ -1,6 +1,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using QuestPDF.Drawing;
 using BillSplitter.Application.Interfaces;
 
 namespace BillSplitter.Infrastructure.Pdf;
@@ -10,6 +11,25 @@ public class SessionSummaryPdfService : ISessionPdfService
     public SessionSummaryPdfService()
     {
         QuestPDF.Settings.License = LicenseType.Community;
+        
+        // Register Arabic fonts for Linux support
+        var fontDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fonts");
+        
+        // Also check Linux-specific paths in case of Docker layer differences
+        if (!Directory.Exists(fontDir)) fontDir = "/app/fonts";
+
+        if (Directory.Exists(fontDir))
+        {
+            foreach (var fontFile in Directory.GetFiles(fontDir, "*.ttf"))
+            {
+                try 
+                {
+                    using var stream = File.OpenRead(fontFile);
+                    FontManager.RegisterFont(stream);
+                }
+                catch { /* Ignore if font registration fails locally */ }
+            }
+        }
     }
 
     public byte[] GenerateSessionSummaryPdf(SessionSummary summary)

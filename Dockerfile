@@ -28,10 +28,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     libfontconfig1 \
     curl \
-    && mkdir -p /usr/share/fonts/truetype/elmessiri \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Regular.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Regular.ttf \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Medium.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Medium.ttf \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Bold.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Bold.ttf \
+    && mkdir -p /app/fonts \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Regular.ttf -o /app/fonts/ElMessiri-Regular.ttf \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Medium.ttf -o /app/fonts/ElMessiri-Medium.ttf \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Bold.ttf -o /app/fonts/ElMessiri-Bold.ttf \
+    && chown -R app:app /app/fonts \
     && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
