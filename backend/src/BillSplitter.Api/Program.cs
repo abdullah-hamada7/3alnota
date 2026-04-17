@@ -22,27 +22,16 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddBillSplitterServices(connectionString);
 
 var allowedOriginsConfig = builder.Configuration.GetValue<string>("AllowedOrigins") 
-    ?? "http://localhost:3000";
-
-// Support both comma-separated strings and single entries (*)
-var allowedOrigins = allowedOriginsConfig.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    ?? "*"; // Default to * for launch
 
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        if (allowedOriginsConfig == "*")
-        {
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-        }
-        else
-        {
-            policy.WithOrigins(allowedOrigins)
-                  .SetIsOriginAllowedToAllowWildcardSubdomains()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        }
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -96,7 +85,7 @@ app.UseRouting();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 // CORS must be between UseRouting and UseAuthorization
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseSessionAccessResolver();
 
