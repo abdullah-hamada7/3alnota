@@ -31,7 +31,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Monetary calculations use high-precision decimal types only; no floating-point money paths are introduced.
+- [ ] Monetary logic is deterministic and covered by isolated, repeatable unit tests.
+- [ ] User-facing workflows are designed mobile-first, with the smallest supported viewport defined first.
+- [ ] External APIs remain RESTful and stateless, with no server-side session dependency.
+- [ ] Feature scope includes unit test work for all changed behavior.
+- [ ] Calculation-heavy paths are designed to run in O(n log n) time or better, with the dominant operation identified.
 
 ## Project Structure
 

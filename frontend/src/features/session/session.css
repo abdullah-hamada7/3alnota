@@ -1,0 +1,124 @@
+/* Session-specific styles - normalized to use design tokens from globals.css */
+
+.session-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.session-header h1 {
+  margin-bottom: var(--spacing-xs);
+}
+
+.session-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.session-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.participant-list,
+.item-list,
+.charge-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0;
+}
+
+.participant-list li,
+.item-list li,
+.charge-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.participant-list li:last-child,
+.item-list li:last-child,
+.charge-list li:last-child {
+  border-bottom: none;
+}
+
+.form-inline {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  margin-top: var(--spacing-md);
+}
+
+.form-inline input {
+  flex: 1;
+}
+
+.form-inline button {
+  min-width: 80px;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+  font-size: 14px;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: var(--spacing-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.summary-table td.amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-table tfoot td {
+  border-top: 2px solid var(--border-color);
+  font-weight: 600;
+}
+
+.summary-table tfoot td.amount {
+  text-align: right;
+}
+
+.btn-group {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.btn-group button {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .session-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .session-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .summary-table {
+    font-size: 16px;
+  }
+}

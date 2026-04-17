@@ -1,0 +1,54 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+packages/
+.vs/
+*.log
+
+# Node.js
+node_modules/
+dist/
+build/
+*.log
+.env*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+coverage/
+TestResults/
+
+# Build outputs
+*.dll
+*.exe
+*.pdb
+
+.agent
+.opencode/
+.claude
+.specify/
+specs/
+.github/
+backend/tests/
+frontend/tests/
+.impeccable.md
+AGENTS.md
+
+# Next.js
+.next/
+out/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

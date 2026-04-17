@@ -74,6 +74,9 @@
 
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
+- How does the system preserve decimal precision and rounding rules for every monetary edge case?
+- How does the mobile layout behave at the smallest supported viewport without losing required actions?
+- How does the API behave when the same stateless request is retried?
 
 ## Requirements *(mandatory)*
 
@@ -89,11 +92,16 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-006**: Financial calculations MUST use high-precision decimal arithmetic and MUST NOT rely on floating-point types for money.
+- **FR-007**: Monetary operations MUST be deterministic and directly unit testable with repeatable inputs and outputs.
+- **FR-008**: User-facing functionality MUST work from the smallest supported mobile viewport upward.
+- **FR-009**: APIs MUST be RESTful and stateless.
+- **FR-010**: Calculation-intensive behavior MUST meet an O(n log n) worst-case time bound or better.
 
 *Example of marking unclear requirements:*
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-011**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-012**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -113,6 +121,8 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-005**: Monetary results are identical across repeated runs with the same inputs and configured rounding policy.
+- **SC-006**: Primary user journeys remain usable on the smallest supported mobile viewport.
 
 ## Assumptions
 
@@ -123,6 +133,6 @@
 -->
 
 - [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about scope boundaries, e.g., "Mobile is an in-scope first-class experience for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]

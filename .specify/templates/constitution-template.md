@@ -1,50 +1,81 @@
 # [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Decimal Precision For Money
+All financial calculations MUST use high-precision decimal arithmetic and MUST
+NOT use binary floating-point types for persisted, displayed, or compared
+monetary values. Currency amounts, rates, fees, taxes, and derived totals MUST
+preserve declared precision and rounding rules at every boundary.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: monetary drift from floating-point arithmetic is unacceptable and can
+create user-visible defects, reconciliation failures, and audit risk.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Deterministic Financial Logic
+All monetary operations MUST be deterministic, side-effect controlled, and
+directly testable in isolation. The same inputs, configuration, ordering rules,
+and rounding policy MUST always produce the same outputs regardless of runtime,
+timezone, locale, or request repetition.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: financial systems must be reproducible for debugging, auditability,
+and reliable regression testing.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Mobile-First Experience
+Every user-facing workflow MUST be designed mobile-first before desktop
+enhancement. Specifications, layouts, acceptance criteria, and implementation
+plans MUST define the smallest supported viewport first, then scale upward
+without hiding required functionality.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: mobile usage is a primary product path, and designing from the most
+constrained surface prevents inaccessible or incomplete experiences.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Stateless REST APIs
+All network APIs MUST be RESTful and stateless. Each request MUST contain all
+context required for authorization and processing, resources MUST be modeled
+explicitly, and server-side session affinity MUST NOT be required for correct
+behavior.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: stateless REST interfaces simplify scaling, caching, testing, and
+cross-client interoperability.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Mandatory Unit Test Coverage
+Every feature, rule, and bug fix MUST include unit tests that cover the normal
+path, relevant edge cases, and failure scenarios. Work is not complete until the
+tests pass and clearly exercise the behavior introduced or changed.
+
+Rationale: mandatory unit coverage keeps financial logic safe to change and
+makes deterministic behavior continuously enforceable.
+
+## Performance Standards
+
+Financial calculation paths MUST run in O(n log n) time or better with respect
+to the number of input records they process. Any design that exceeds this bound
+MUST be rejected unless the constitution is amended first. Plans and reviews
+MUST call out the dominant operation, expected input size, and how the bound is
+maintained.
+
+## Delivery Workflow
+
+Specifications MUST include explicit requirements for decimal arithmetic,
+deterministic behavior, mobile-first UX, REST statelessness, unit test coverage,
+and the O(n log n) performance ceiling when applicable. Implementation plans
+MUST fail their Constitution Check if any of these constraints are missing or
+contradicted. Task breakdowns MUST include the unit tests and validation work
+needed to prove compliance.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes conflicting local conventions, examples, and
+generated defaults. Every specification, plan, task list, implementation, and
+review MUST verify compliance with all principles and sections in this document.
+
+Amendments MUST be documented in this file, include a Sync Impact Report, and
+apply semantic versioning to the constitution itself: MAJOR for incompatible
+principle changes or removals, MINOR for new principles or materially expanded
+governance, and PATCH for clarifications that do not change intent.
+
+Compliance reviews MUST reject work that uses floating-point money logic, omits
+unit tests, ships non-mobile-first UX, introduces non-RESTful or stateful APIs,
+or lacks evidence that calculation performance stays within O(n log n).
 
 **Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

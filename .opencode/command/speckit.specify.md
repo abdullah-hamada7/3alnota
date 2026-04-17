@@ -110,6 +110,7 @@ Given that feature description, do this:
     5. Generate Functional Requirements
        Each requirement must be testable
        Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
+       Include constitution-mandated requirements for decimal money logic, deterministic behavior, mobile-first UX, RESTful stateless APIs, unit tests, and O(n log n) calculation performance where relevant
     6. Define Success Criteria
        Create measurable, technology-agnostic outcomes
        Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
@@ -147,6 +148,7 @@ Given that feature description, do this:
       - [ ] Edge cases are identified
       - [ ] Scope is clearly bounded
       - [ ] Dependencies and assumptions identified
+      - [ ] Constitution-mandated constraints are captured when applicable (decimal money logic, determinism, mobile-first UX, RESTful stateless APIs, unit tests, O(n log n) calculations)
       
       ## Feature Readiness
       
@@ -250,6 +252,7 @@ Given that feature description, do this:
 - Avoid HOW to implement (no tech stack, APIs, code structure).
 - Written for business stakeholders, not developers.
 - DO NOT create any checklists that are embedded in the spec. That will be a separate command.
+- Do not treat mobile support as optional when the feature has a user-facing surface.
 
 ### Section Requirements
 
