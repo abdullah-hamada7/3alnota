@@ -241,13 +241,6 @@ html, body {
   padding: 0 var(--space-md) var(--space-md);
 }
 
-.expand-hint {
-  padding: var(--space-xs) var(--space-md);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-style: italic;
-  border-top: 1px dashed var(--bg-elevated);
-}
 
 /* Empty state */
 .empty-state {

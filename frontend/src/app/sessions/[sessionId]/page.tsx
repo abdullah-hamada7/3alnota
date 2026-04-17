@@ -111,9 +111,6 @@ const Section = ({
             <ChevronDown size={18} />
           </span>
         )}
-        {expandable && !isExpanded && (
-          <div className="expand-hint">{t.tapToExpand}</div>
-        )}
       </button>
       <div className="section-content">
         {children}
