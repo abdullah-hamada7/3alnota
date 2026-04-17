@@ -5,7 +5,7 @@ import { toPng } from 'html-to-image';
 
 interface SaveAsImageProps {
   containerRef: RefObject<HTMLDivElement | null>;
-  sessionName?: string;
+  sessionName?: string | null;
 }
 
 const SaveAsImage: React.FC<SaveAsImageProps> = ({ containerRef, sessionName }) => {
@@ -50,7 +50,7 @@ const SaveAsImage: React.FC<SaveAsImageProps> = ({ containerRef, sessionName }) 
       className="save-image-btn"
     >
       <span className="export-icon">📸</span>
-      {isExporting ? 'بنصور...' : 'شير كصورة'}
+      {isExporting ? 'بنصور...' : 'حفظ كصورة'}
     </button>
   );
 };

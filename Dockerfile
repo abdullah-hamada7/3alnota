@@ -23,13 +23,6 @@ RUN dotnet publish "BillSplitter.Api.csproj" -c Release -o /app/publish /p:UseAp
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 
-# Install fontconfig and fonts for Arabic support
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    fontconfig \
-    libfontconfig1 \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY --from=publish /app/publish .
 
 # Use the built-in .NET 'app' user for security
