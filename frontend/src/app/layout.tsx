@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
+import Link from 'next/link';
 import './globals.css';
+
 
 export const metadata: Metadata = {
   title: 'عالنوتة - قسّم وصفي الحساب بسهولة',
@@ -46,13 +48,18 @@ export default function RootLayout({
             <div className="footer-content">
               <div className="footer-links">
                 <a
-                  href="https://forms.gle/your-feedback-form"
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSfcOhBmcJBb7RRcFG0Q3j8PfXWMWhmvNJi1q8UjKE3WV9uIrw/viewform?usp=header"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="feedback-link"
                 >
-                  قولنا رأيك ✨
+                  قولنا رأيك
                 </a>
+                <span className="divider">|</span>
+                <Link href="/" className="history-link">
+                  كل النوتات
+                </Link>
+
               </div>
               <div className="footer-branding">
                 <p className="app-name">عالنوتة</p>

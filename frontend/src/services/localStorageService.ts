@@ -24,6 +24,28 @@ export class LocalStorageService {
     localStorage.removeItem(this.getStorageKey(sessionId));
   }
 
+  static getAllSessions(): Session[] {
+    if (typeof window === "undefined") return [];
+    const sessions: Session[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(STORAGE_KEY_PREFIX)) {
+        const data = localStorage.getItem(key);
+        if (data) {
+          try {
+            sessions.push(JSON.parse(data) as Session);
+          } catch (e) {
+            console.error("Failed to parse session", key, e);
+          }
+        }
+      }
+    }
+    return sessions.sort((a, b) => 
+      new Date(b.updatedAtUtc).getTime() - new Date(a.updatedAtUtc).getTime()
+    );
+  }
+
+
   static createSession(name: string | null = null): Session {
     const sessionId = Math.random().toString(36).substring(2, 15);
     const now = new Date().toISOString();

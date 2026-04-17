@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as sessionService from "@/services/sessionService";
 import { PlusCircle } from "lucide-react";
+import HistoryList from "@/features/session/components/HistoryList";
+
 
 export default function HomePage() {
   const router = useRouter();
@@ -65,6 +67,9 @@ export default function HomePage() {
           )}
         </button>
       </form>
+
+      <HistoryList />
+
 
       <div className="hint">
         سجّل الطلبات والأسامي، وصفي الحساب!<br />

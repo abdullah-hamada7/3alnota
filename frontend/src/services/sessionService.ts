@@ -159,3 +159,11 @@ export async function deleteBillItem(
   session.items = session.items.filter(i => i.itemId !== itemId);
   LocalStorageService.saveSession(session);
 }
+
+export const getHistory = (): Session[] => {
+  return LocalStorageService.getAllSessions();
+};
+
+export const deleteSession = (sessionId: string): void => {
+  LocalStorageService.deleteSession(sessionId);
+};
