@@ -393,7 +393,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         )}
 
         <div className="stagger-1">
-          <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
+          <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={true} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
             {session.status === "Draft" && (
               <div className="input-group">
                 <input

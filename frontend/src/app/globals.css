@@ -239,6 +239,21 @@ html, body {
 
 .section-content {
   padding: 0 var(--space-md) var(--space-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  max-height: 5000px;
+}
+
+.collapsed .section-content {
+  padding-top: 0;
+  padding-bottom: 0;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.animating .section-content {
+  overflow: hidden;
 }
 
 
