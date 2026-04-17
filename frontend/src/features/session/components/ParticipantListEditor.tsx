@@ -7,16 +7,16 @@ import * as sessionService from "../../../services/sessionService";
 interface ParticipantListEditorProps {
   sessionId: string;
   participants: Participant[];
-  organizerToken: string;
   onUpdate: () => void;
 }
+
 
 export default function ParticipantListEditor({ 
   sessionId, 
   participants, 
-  organizerToken, 
   onUpdate 
 }: ParticipantListEditorProps) {
+
   const [newName, setNewName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +29,7 @@ export default function ParticipantListEditor({
     setError("");
 
     try {
-      await sessionService.addParticipant(sessionId, newName, organizerToken);
+      await sessionService.addParticipant(sessionId, newName);
       setNewName("");
       onUpdate();
     } catch (err) {

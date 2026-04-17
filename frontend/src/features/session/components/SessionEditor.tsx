@@ -6,11 +6,12 @@ import * as sessionService from "../../../services/sessionService";
 
 interface SessionEditorProps {
   session: Session;
-  organizerToken: string;
   onUpdate: (session: Session) => void;
 }
 
-export default function SessionEditor({ session, organizerToken, onUpdate }: SessionEditorProps) {
+
+export default function SessionEditor({ session, onUpdate }: SessionEditorProps) {
+
   const [name, setName] = useState(session.name || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,7 +22,7 @@ export default function SessionEditor({ session, organizerToken, onUpdate }: Ses
     setError("");
 
     try {
-      const updated = await sessionService.updateSession(session.sessionId, name, organizerToken);
+      const updated = await sessionService.updateSession(session.sessionId, name);
       onUpdate(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update");

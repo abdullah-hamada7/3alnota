@@ -8,17 +8,17 @@ interface BillItemEditorProps {
   sessionId: string;
   items: BillItem[];
   participants: Participant[];
-  organizerToken: string;
   onUpdate: () => void;
 }
+
 
 export default function BillItemEditor({
   sessionId,
   items,
   participants,
-  organizerToken,
   onUpdate
 }: BillItemEditorProps) {
+
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +32,7 @@ export default function BillItemEditor({
     setError("");
 
     try {
-      await sessionService.addBillItem(sessionId, name, amount, organizerToken);
+      await sessionService.addBillItem(sessionId, name, amount);
       setName("");
       setAmount("");
       onUpdate();

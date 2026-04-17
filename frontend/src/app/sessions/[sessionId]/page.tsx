@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import apiClient from "@/services/apiClient";
 import { Session, Participant, BillItem } from "@/features/session/types";
+
 import SessionErrorState from "@/features/session/components/SessionErrorState";
 import {
   Users,
@@ -22,9 +22,10 @@ import {
   Copy,
   Check,
   FileText,
-  CheckCircle2,
-  RefreshCw
+  CheckCircle2
 } from "lucide-react";
+import * as sessionService from "@/services/sessionService";
+
 
 const t = {
   appName: "عالنوتة",
@@ -161,8 +162,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const loadSession = async () => {
     if (!sessionId) return;
     try {
-      const endpoint = `/api/sessions/${sessionId}`;
-      const data = await apiClient<Session>(endpoint);
+      const data = await sessionService.getSession(sessionId);
       setSession(data);
       setIsCalculated(data.status === "Calculated" || data.status === "Settled");
     } catch (err) {
@@ -171,6 +171,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       setIsLoading(false);
     }
   };
+
 
   const toggleSection = (section: keyof ExpandedSections) => {
     setAnimatingSection(section);
@@ -195,9 +196,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const calculateSession = async () => {
     if (!sessionId) return;
     try {
-      const result = await apiClient<any>(`/api/sessions/${sessionId}/calculate`, {
-        method: "POST",
-      });
+      const result = await sessionService.calculateSession(sessionId);
       setCalculateResult(result);
       setIsCalculated(true);
       setExpanded({ participants: true, items: false, charges: false, payments: false, results: true, settlements: true });
@@ -207,13 +206,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+
   const replacePayments = async (payments: { participantId: string; paidAmount: string }[]) => {
     if (!sessionId) return;
     try {
-      await apiClient<void>(`/api/sessions/${sessionId}/payments`, {
-        method: "PUT",
-        body: { payments },
-      });
+      await sessionService.replacePayments(sessionId, payments);
       await loadSession();
       showToast("اتسجلت تمام ✅");
     } catch (err) {
@@ -221,13 +218,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+
   const addParticipant = async () => {
     if (!sessionId || !newParticipantName.trim()) return;
     try {
-      await apiClient<Participant>(`/api/sessions/${sessionId}/participants`, {
-        method: "POST",
-        body: { displayName: newParticipantName },
-      });
+      await sessionService.addParticipant(sessionId, newParticipantName);
       setNewParticipantName("");
       await loadSession();
     } catch (err) {
@@ -235,13 +230,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+
   const updateParticipant = async (participantId: string) => {
     if (!sessionId || !editParticipantName.trim()) return;
     try {
-      await apiClient<Participant>(`/api/sessions/${sessionId}/participants/${participantId}`, {
-        method: "PUT",
-        body: { displayName: editParticipantName },
-      });
+      await sessionService.updateParticipant(sessionId, participantId, editParticipantName);
       setEditingParticipant(null);
       setEditParticipantName("");
       await loadSession();
@@ -250,30 +243,29 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+
   const deleteParticipant = async (participantId: string) => {
     if (!sessionId) return;
     if (!confirm("متأكد إنك عايز تشيل صاحبك ده؟")) return;
     try {
-      await apiClient<void>(`/api/sessions/${sessionId}/participants/${participantId}`, {
-        method: "DELETE",
-      });
+      await sessionService.deleteParticipant(sessionId, participantId);
       await loadSession();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
     }
   };
 
+
   const addItem = async () => {
     if (!sessionId || !newItem.name || !newItem.amount || !newItem.participantId) return;
     try {
-      await apiClient<BillItem>(`/api/sessions/${sessionId}/items`, {
-        method: "POST",
-        body: {
-          name: newItem.name,
-          amount: newItem.amount,
-          assignments: [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }]
-        },
-      });
+      await sessionService.addBillItem(
+        sessionId,
+        newItem.name,
+        newItem.amount,
+        undefined,
+        [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }]
+      );
       setNewItem({ name: "", amount: "", participantId: "" });
       await loadSession();
     } catch (err) {
@@ -281,32 +273,30 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+
   const deleteItem = async (itemId: string) => {
     if (!sessionId) return;
     if (!confirm("متأكد إنك عايز تحذف الطلب ده؟")) return;
     try {
-      await apiClient<void>(`/api/sessions/${sessionId}/items/${itemId}`, {
-        method: "DELETE",
-      });
+      await sessionService.deleteBillItem(sessionId, itemId);
       await loadSession();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
     }
   };
 
+
   const addCharge = async () => {
     if (!sessionId || !newCharge.amount) return;
     try {
-      await apiClient<void>(`/api/sessions/${sessionId}/charges`, {
-        method: "PUT",
-        body: { charges: [{ type: "both", amount: newCharge.amount }] },
-      });
+      await sessionService.replaceCharges(sessionId, [{ type: "both", amount: newCharge.amount }]);
       setNewCharge({ amount: "" });
       await loadSession();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add charge");
     }
   };
+
 
   const settlements: any[] = calculateResult?.settlements || [];
 
@@ -584,18 +574,12 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       </div>
 
       <div className="action-area">
-        {session.status === "Draft" ? (
+        {session.status === "Draft" && (
           <button className="calculate-btn" onClick={calculateSession}>
             الحسبة
           </button>
-        ) : (
-          <>
-            <button className="refresh-btn" onClick={loadSession}>
-              <RefreshCw size={18} />
-              <span>تحديث</span>
-            </button>
-          </>
         )}
+
       </div>
 
       {toast && <div className="toast">{toast}</div>}

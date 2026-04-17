@@ -1,111 +1,161 @@
-import apiClient from "./apiClient";
-import { Session, CreateSessionResponse, Participant, BillItem, SessionCharge } from "../features/session/types";
+import { Session, CreateSessionResponse, Participant, BillItem } from "../features/session/types";
+import LocalStorageService from "./localStorageService";
 
 export async function createSession(name?: string): Promise<CreateSessionResponse> {
-  return apiClient<CreateSessionResponse>("/api/sessions", {
-    method: "POST",
-    body: { name: name || null },
-  });
+  const session = LocalStorageService.createSession(name || null);
+  
+  // Mocking the response to match what the component expects
+  return {
+    sessionId: session.sessionId,
+    name: session.name,
+    currency: session.currency,
+    status: session.status,
+    organizerToken: "local-token", // No longer needed but kept for compatibility
+    viewerToken: "local-viewer",
+    organizerLink: `/sessions/${session.sessionId}`,
+    viewerLink: `/sessions/${session.sessionId}`,
+    createdAtUtc: session.createdAtUtc
+  };
 }
 
-export async function getSession(sessionId: string, token?: string): Promise<Session> {
-  return apiClient<Session>(`/api/sessions/${sessionId}`, {
-    viewerToken: token,
-  });
+export async function getSession(sessionId: string, _token?: string): Promise<Session> {
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+  return session;
 }
 
-export async function updateSession(sessionId: string, name: string, organizerToken: string): Promise<Session> {
-  return apiClient<Session>(`/api/sessions/${sessionId}`, {
-    method: "PATCH",
-    body: { name },
-    organizerToken,
-  });
+export async function updateSession(sessionId: string, name: string): Promise<Session> {
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+  
+  session.name = name;
+  session.updatedAtUtc = new Date().toISOString();
+  LocalStorageService.saveSession(session);
+  return session;
 }
 
-export async function calculateSession(sessionId: string, organizerToken: string): Promise<any> {
-  return apiClient<any>(`/api/sessions/${sessionId}/calculate`, {
-    method: "POST",
-    organizerToken,
-  });
+export async function calculateSession(sessionId: string): Promise<any> {
+  const result = LocalStorageService.calculate(sessionId);
+  return {
+    ...result.session,
+    settlements: result.settlements
+  };
 }
 
-export async function addParticipant(sessionId: string, displayName: string, organizerToken: string): Promise<Participant> {
-  return apiClient<Participant>(`/api/sessions/${sessionId}/participants`, {
-    method: "POST",
-    body: { displayName },
-    organizerToken,
-  });
+export async function addParticipant(sessionId: string, displayName: string): Promise<Participant> {
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  const participant: Participant = {
+    participantId: Math.random().toString(36).substring(2, 9),
+    displayName,
+    paidAmount: "0",
+    subtotal: "0",
+    allocatedCharges: "0",
+    finalAmount: "0",
+    balance: "0"
+  };
+
+  session.participants.push(participant);
+  LocalStorageService.saveSession(session);
+  return participant;
 }
 
 export async function addBillItem(
   sessionId: string,
   name: string,
   amount: string,
-  organizerToken: string,
+  _token?: string,
   assignments?: any[]
 ): Promise<BillItem> {
-  return apiClient<BillItem>(`/api/sessions/${sessionId}/items`, {
-    method: "POST",
-    body: { name, amount, assignments: assignments || [] },
-    organizerToken,
-  });
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  const item: BillItem = {
+    itemId: Math.random().toString(36).substring(2, 9),
+    name,
+    amount,
+    assignments: assignments || []
+  };
+
+  session.items.push(item);
+  LocalStorageService.saveSession(session);
+  return item;
 }
 
 export async function replaceCharges(
   sessionId: string,
-  charges: { type: string; amount: string }[],
-  organizerToken: string
+  charges: { type: string; amount: string }[]
 ): Promise<void> {
-  return apiClient<void>(`/api/sessions/${sessionId}/charges`, {
-    method: "PUT",
-    body: { charges },
-    organizerToken,
-  });
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  session.charges = charges.map(c => ({
+    chargeId: Math.random().toString(36).substring(2, 9),
+    type: c.type as any,
+    amount: c.amount
+  }));
+
+  LocalStorageService.saveSession(session);
 }
 
 export async function replacePayments(
   sessionId: string,
-  payments: { participantId: string; paidAmount: string }[],
-  organizerToken: string
+  payments: { participantId: string; paidAmount: string }[]
 ): Promise<void> {
-  return apiClient<void>(`/api/sessions/${sessionId}/payments`, {
-    method: "PUT",
-    body: { payments },
-    organizerToken,
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  payments.forEach(p => {
+    const participant = session.participants.find(part => part.participantId === p.participantId);
+    if (participant) {
+      participant.paidAmount = p.paidAmount;
+    }
   });
+
+  LocalStorageService.saveSession(session);
 }
 
 export async function updateParticipant(
   sessionId: string,
   participantId: string,
-  displayName: string,
-  organizerToken: string
+  displayName: string
 ): Promise<Participant> {
-  return apiClient<Participant>(`/api/sessions/${sessionId}/participants/${participantId}`, {
-    method: "PUT",
-    body: { displayName },
-    organizerToken,
-  });
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  const participant = session.participants.find(p => p.participantId === participantId);
+  if (!participant) throw new Error("Participant not found");
+
+  participant.displayName = displayName;
+  LocalStorageService.saveSession(session);
+  return participant;
 }
 
 export async function deleteParticipant(
   sessionId: string,
-  participantId: string,
-  organizerToken: string
+  participantId: string
 ): Promise<void> {
-  return apiClient<void>(`/api/sessions/${sessionId}/participants/${participantId}`, {
-    method: "DELETE",
-    organizerToken,
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  session.participants = session.participants.filter(p => p.participantId !== participantId);
+  
+  // Also remove assignments from items
+  session.items.forEach(item => {
+    item.assignments = item.assignments.filter(a => a.participantId !== participantId);
   });
+
+  LocalStorageService.saveSession(session);
 }
 
 export async function deleteBillItem(
   sessionId: string,
-  itemId: string,
-  organizerToken: string
+  itemId: string
 ): Promise<void> {
-  return apiClient<void>(`/api/sessions/${sessionId}/items/${itemId}`, {
-    method: "DELETE",
-    organizerToken,
-  });
+  const session = LocalStorageService.getSession(sessionId);
+  if (!session) throw new Error("Session not found");
+
+  session.items = session.items.filter(i => i.itemId !== itemId);
+  LocalStorageService.saveSession(session);
 }

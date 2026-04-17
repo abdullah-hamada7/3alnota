@@ -7,16 +7,16 @@ import * as sessionService from "../../../services/sessionService";
 interface PaymentEditorProps {
   sessionId: string;
   participants: Participant[];
-  organizerToken: string;
   onUpdate: () => void;
 }
+
 
 export default function PaymentEditor({ 
   sessionId, 
   participants, 
-  organizerToken, 
   onUpdate 
 }: PaymentEditorProps) {
+
   const [payments, setPayments] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     participants.forEach(p => {
@@ -37,7 +37,7 @@ export default function PaymentEditor({
         participantId,
         paidAmount,
       }));
-      await sessionService.replacePayments(sessionId, paymentUpdates, organizerToken);
+      await sessionService.replacePayments(sessionId, paymentUpdates);
       onUpdate();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save payments");

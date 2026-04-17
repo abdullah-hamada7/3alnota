@@ -14,97 +14,83 @@ export function useSessionWorkspace({ sessionId, token }: UseSessionWorkspaceOpt
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const isOrganizer = token?.startsWith("org_") ?? false;
-
   const loadSession = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const data = await sessionService.getSession(sessionId, token || undefined);
+      const data = await sessionService.getSession(sessionId);
       setSession(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load session");
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, token]);
+  }, [sessionId]);
 
   useEffect(() => {
     loadSession();
   }, [loadSession]);
 
   const updateSession = useCallback(async (name: string) => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      const updated = await sessionService.updateSession(sessionId, name, token);
+      const updated = await sessionService.updateSession(sessionId, name);
       setSession(updated);
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer]);
+  }, [sessionId]);
 
   const calculateSession = useCallback(async () => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      await sessionService.calculateSession(sessionId, token);
+      await sessionService.calculateSession(sessionId);
       await loadSession();
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer, loadSession]);
+  }, [sessionId, loadSession]);
 
   const addParticipant = useCallback(async (displayName: string) => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      await sessionService.addParticipant(sessionId, displayName, token);
+      await sessionService.addParticipant(sessionId, displayName);
       await loadSession();
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer, loadSession]);
+  }, [sessionId, loadSession]);
 
   const addBillItem = useCallback(async (name: string, amount: string) => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      await sessionService.addBillItem(sessionId, name, amount, token);
+      await sessionService.addBillItem(sessionId, name, amount);
       await loadSession();
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer, loadSession]);
+  }, [sessionId, loadSession]);
 
   const replaceCharges = useCallback(async (charges: { type: string; amount: string }[]) => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      await sessionService.replaceCharges(sessionId, charges, token);
+      await sessionService.replaceCharges(sessionId, charges);
       await loadSession();
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer, loadSession]);
+  }, [sessionId, loadSession]);
 
   const replacePayments = useCallback(async (payments: { participantId: string; paidAmount: string }[]) => {
-    if (!isOrganizer || !token) return;
-    
     try {
-      await sessionService.replacePayments(sessionId, payments, token);
+      await sessionService.replacePayments(sessionId, payments);
       await loadSession();
     } catch (err) {
       throw err;
     }
-  }, [sessionId, token, isOrganizer, loadSession]);
+  }, [sessionId, loadSession]);
 
   return {
     session,
     isLoading,
     error,
-    isOrganizer,
+    isOrganizer: true,
     reload: loadSession,
     updateSession,
     calculateSession,
@@ -113,4 +99,5 @@ export function useSessionWorkspace({ sessionId, token }: UseSessionWorkspaceOpt
     replaceCharges,
     replacePayments,
   };
+
 }

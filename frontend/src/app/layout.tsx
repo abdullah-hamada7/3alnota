@@ -45,9 +45,9 @@ export default function RootLayout({
           <footer className="app-footer">
             <div className="footer-content">
               <div className="footer-links">
-                <a 
-                  href="https://forms.gle/your-feedback-form" 
-                  target="_blank" 
+                <a
+                  href="https://forms.gle/your-feedback-form"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="feedback-link"
                 >
@@ -56,7 +56,7 @@ export default function RootLayout({
               </div>
               <div className="footer-branding">
                 <p className="app-name">عالنوتة</p>
-                <p className="credit">© {new Date().getFullYear()} Abdullah Hamada</p>
+                <p className="credit">© Abdullah Hamada</p>
               </div>
             </div>
           </footer>

@@ -7,16 +7,15 @@ import * as sessionService from "../../../services/sessionService";
 interface ChargeEditorProps {
   sessionId: string;
   charges: SessionCharge[];
-  organizerToken: string;
   onUpdate: () => void;
 }
 
 export default function ChargeEditor({
   sessionId,
   charges,
-  organizerToken,
   onUpdate
 }: ChargeEditorProps) {
+
   const [taxAmount, setTaxAmount] = useState("");
   const [serviceAmount, setServiceAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +36,7 @@ export default function ChargeEditor({
         chargesToSet.push({ type: "service", amount: serviceAmount });
       }
 
-      await sessionService.replaceCharges(sessionId, chargesToSet, organizerToken);
+      await sessionService.replaceCharges(sessionId, chargesToSet);
       setTaxAmount("");
       setServiceAmount("");
       onUpdate();

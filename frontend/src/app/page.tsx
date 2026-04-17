@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import apiClient from "@/services/apiClient";
-import { CreateSessionResponse } from "@/features/session/types";
-import WakeUpCheck from "@/components/WakeUpCheck";
+import * as sessionService from "@/services/sessionService";
 import { PlusCircle } from "lucide-react";
 
 export default function HomePage() {
@@ -19,12 +17,9 @@ export default function HomePage() {
     setError("");
 
     try {
-      const response = await apiClient<CreateSessionResponse>("/api/sessions", {
-        method: "POST",
-        body: { name: sessionName || null },
-      });
+      const response = await sessionService.createSession(sessionName);
 
-      router.push(`/sessions/${response.sessionId}?token=${response.organizerToken}`);
+      router.push(`/sessions/${response.sessionId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create session");
       setIsLoading(false);
@@ -32,51 +27,49 @@ export default function HomePage() {
   };
 
   return (
-    <WakeUpCheck>
-      <main className="home-container">
-        <div className="hero">
-          <div className="logo-mark">ن</div>
-          <h1 className="brand-name">عالنوتة</h1>
-          <p className="tagline">قسّم الحسبة وصفي حسابك مع صحابك بسهولة</p>
-        </div>
+    <main className="home-container">
+      <div className="hero">
+        <div className="logo-mark">ن</div>
+        <h1 className="brand-name">عالنوتة</h1>
+        <p className="tagline">قسّم الحسبة وصفي حسابك مع صحابك بسهولة</p>
+      </div>
 
-        <form onSubmit={handleCreateSession} className="create-form">
-          <div className="form-group">
-            <input
-              type="text"
-              className="name-input"
-              value={sessionName}
-              onChange={(e) => setSessionName(e.target.value)}
-              placeholder="قولنا الحسبة دي بتاعة إيه؟"
-              disabled={isLoading}
-            />
-          </div>
-
-          {error && (
-            <div className="form-error">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
+      <form onSubmit={handleCreateSession} className="create-form">
+        <div className="form-group">
+          <input
+            type="text"
+            className="name-input"
+            value={sessionName}
+            onChange={(e) => setSessionName(e.target.value)}
+            placeholder="قولنا الحسبة دي بتاعة إيه؟"
             disabled={isLoading}
-            className="create-btn"
-          >
-            {isLoading ? "..." : (
-              <>
-                <PlusCircle size={20} />
-                <span>افتح النوتة</span>
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="hint">
-          سجّل الطلبات والأسامي، وصفي الحساب!<br />
-          عشان كل واحد يعرف اللي ليه واللي عليه
+          />
         </div>
-      </main>
-    </WakeUpCheck>
+
+        {error && (
+          <div className="form-error">
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="create-btn"
+        >
+          {isLoading ? "..." : (
+            <>
+              <PlusCircle size={20} />
+              <span>افتح النوتة</span>
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="hint">
+        سجّل الطلبات والأسامي، وصفي الحساب!<br />
+        عشان كل واحد يعرف اللي ليه واللي عليه
+      </div>
+    </main>
   );
 }
