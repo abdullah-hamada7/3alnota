@@ -24,7 +24,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#10b981',
+  themeColor: '#c9653a',
 };
 
 export default function RootLayout({
@@ -55,10 +55,6 @@ export default function RootLayout({
                 >
                   قولنا رأيك
                 </a>
-                <span className="divider">|</span>
-                <Link href="/" className="history-link">
-                  كل النوتات
-                </Link>
 
               </div>
               <div className="footer-branding">

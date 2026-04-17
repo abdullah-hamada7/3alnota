@@ -1,11 +1,11 @@
 {
-  "name": "El7esba - عالنوتة",
+  "name": "عالنوتة - 3alnota",
   "short_name": "عالنوتة",
-  "description": "حساب الفواتير وتقسيمها بسهولة",
+  "description": "حساب الفواتير وتقسيمها بسهولة وبوضوح",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a192f",
-  "theme_color": "#10b981",
+  "background_color": "#1a1612",
+  "theme_color": "#c9653a",
   "icons": [
     {
       "src": "/icon-192x192.png",
