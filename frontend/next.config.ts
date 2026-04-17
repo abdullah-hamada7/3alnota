@@ -1,4 +1,4 @@
-import { withSerwistInit } from "@serwist/next";
+import withSerwistInit from "@serwist/next";
 import type { NextConfig } from "next";
 
 const withSerwist = withSerwistInit({
