@@ -21,18 +21,28 @@ if (!builder.Environment.IsEnvironment("Testing"))
 
 builder.Services.AddBillSplitterServices(connectionString);
 
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
-    ?? new[] { "http://localhost:3000" };
+var allowedOriginsConfig = builder.Configuration.GetValue<string>("AllowedOrigins") 
+    ?? "http://localhost:3000";
+
+// Support both comma-separated strings and single entries (*)
+var allowedOrigins = allowedOriginsConfig.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
 // Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .SetIsOriginAllowedToAllowWildcardSubdomains()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        if (allowedOriginsConfig == "*")
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .SetIsOriginAllowedToAllowWildcardSubdomains()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
     });
 });
 
