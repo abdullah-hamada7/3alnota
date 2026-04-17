@@ -773,42 +773,6 @@ html, body {
 }
 
 /* Save as Image button */
-.save-image-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  width: 100%;
-  padding: var(--space-md);
-  margin-top: var(--space-sm);
-  background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-copper) 100%);
-  color: var(--bg-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.save-image-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);
-}
-
-.save-image-btn:active {
-  transform: translateY(0);
-}
-
-.save-image-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.export-icon {
-  font-size: 1.1rem;
-}
 
 /* Edit form */
 .edit-form {

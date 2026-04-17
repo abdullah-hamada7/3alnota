@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, use } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import apiClient from "@/services/apiClient";
 import { Session, Participant, BillItem } from "@/features/session/types";
-import SaveAsImage from "@/components/sessions/SaveAsImage";
 import SessionErrorState from "@/features/session/components/SessionErrorState";
 import {
   Users,
@@ -130,7 +129,6 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const router = useRouter();
   const token = searchParams.get("token");
 
-  const receiptRef = useRef<HTMLDivElement>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [calculateResult, setCalculateResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -403,7 +401,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
       {showQR && shareUrl && <QRModal url={shareUrl} onClose={() => setShowQR(false)} onCopy={copyLink} />}
 
-      <div ref={receiptRef} className="receipt-capture-container">
+      <div className="session-main-content">
         {isCalculated && (
           <div className="summary-stats">
             <div className="stat-box">
@@ -636,19 +634,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                 <RefreshCw size={18} />
                 <span>تحديث</span>
               </button>
-              {isCalculated && (
-                <SaveAsImage containerRef={receiptRef} sessionName={session.name} />
-              )}
             </>
           )}
         </div>
       )}
 
-      {!isOrganizer && isCalculated && (
-        <div className="action-area">
-          <SaveAsImage containerRef={receiptRef} sessionName={session?.name} />
-        </div>
-      )}
 
       {showQR && (
         <QRModal
