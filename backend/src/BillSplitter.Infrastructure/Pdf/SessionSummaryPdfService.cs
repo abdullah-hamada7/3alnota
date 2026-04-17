@@ -11,23 +11,26 @@ public class SessionSummaryPdfService : ISessionPdfService
     public SessionSummaryPdfService()
     {
         QuestPDF.Settings.License = LicenseType.Community;
+        QuestPDF.Settings.UseEnvironmentFonts = false;
         
         // Register Arabic fonts for Linux support
         var fontDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fonts");
-        
-        // Also check Linux-specific paths in case of Docker layer differences
         if (!Directory.Exists(fontDir)) fontDir = "/app/fonts";
 
         if (Directory.Exists(fontDir))
         {
-            foreach (var fontFile in Directory.GetFiles(fontDir, "*.ttf"))
+            var regularPath = Path.Combine(fontDir, "ElMessiri-Regular.ttf");
+            var boldPath = Path.Combine(fontDir, "ElMessiri-Bold.ttf");
+
+            if (File.Exists(regularPath))
             {
-                try 
-                {
-                    using var stream = File.OpenRead(fontFile);
-                    FontManager.RegisterFont(stream);
-                }
-                catch { /* Ignore if font registration fails locally */ }
+                using var stream = File.OpenRead(regularPath);
+                FontManager.RegisterFontWithCustomName("ArabicFont", stream);
+            }
+            if (File.Exists(boldPath))
+            {
+                using var stream = File.OpenRead(boldPath);
+                FontManager.RegisterFontWithCustomName("ArabicFontBold", stream);
             }
         }
     }
@@ -40,7 +43,7 @@ public class SessionSummaryPdfService : ISessionPdfService
             {
                 page.Size(PageSizes.A5);
                 page.Margin(30);
-                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("El Messiri"));
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("ArabicFont"));
                 page.ContentFromRightToLeft();
 
                 page.Header().Element(c => ComposeHeader(c, summary));
@@ -57,10 +60,10 @@ public class SessionSummaryPdfService : ISessionPdfService
         container.Column(column =>
         {
             column.Item().AlignCenter().Text("عالنوتة")
-                .FontSize(22).Bold().FontColor("#c9653a");
+                .FontSize(22).FontFamily("ArabicFontBold").FontColor("#c9653a");
 
             column.Item().AlignCenter().Text(summary.SessionName ?? "حسبة القعدة")
-                .FontSize(16).Bold();
+                .FontSize(16).FontFamily("ArabicFontBold");
 
             column.Item().AlignCenter().Text($"رقم الحسبة: {summary.SessionId}")
                 .FontSize(9).FontColor("#6b6258");
@@ -74,7 +77,7 @@ public class SessionSummaryPdfService : ISessionPdfService
         container.PaddingVertical(10).Column(column =>
         {
             // Participants Summary
-            column.Item().Text("مين دفع ومين عليه").FontSize(14).Bold().FontColor("#c9653a");
+            column.Item().Text("مين دفع ومين عليه").FontSize(14).FontFamily("ArabicFontBold").FontColor("#c9653a");
             column.Item().PaddingTop(5).Table(table =>
             {
                 table.ColumnsDefinition(columns =>
@@ -102,14 +105,14 @@ public class SessionSummaryPdfService : ISessionPdfService
                     var balanceColor = p.Balance > 0 ? "#5d9b6b" : p.Balance < 0 ? "#c75050" : "#1e293b";
                     var balanceText = p.Balance > 0 ? $"+{p.Balance:F2}" : $"{p.Balance:F2}";
                     table.Cell().BorderBottom(1).BorderColor("#e2e8f0").Padding(5).AlignRight()
-                        .Text(balanceText).FontColor(balanceColor).Bold();
+                        .Text(balanceText).FontColor(balanceColor).FontFamily("ArabicFontBold");
                 }
             });
 
             // Items
             if (summary.Items.Any())
             {
-                column.Item().PaddingTop(15).Text("الحاجات اللي اتطلبت").FontSize(14).Bold().FontColor("#c9653a");
+                column.Item().PaddingTop(15).Text("الحاجات اللي اتطلبت").FontSize(14).FontFamily("ArabicFontBold").FontColor("#c9653a");
                 column.Item().PaddingTop(5).Table(table =>
                 {
                     table.ColumnsDefinition(columns =>
@@ -138,7 +141,7 @@ public class SessionSummaryPdfService : ISessionPdfService
             // Totals
             column.Item().PaddingTop(15).Row(row =>
             {
-                row.RelativeItem().Text("الحساب الأصلي:").Bold();
+                row.RelativeItem().Text("الحساب الأصلي:").FontFamily("ArabicFontBold");
                 row.ConstantItem(80).AlignRight().Text($"{summary.Subtotal:F2}");
             });
 
@@ -153,14 +156,14 @@ public class SessionSummaryPdfService : ISessionPdfService
 
             column.Item().PaddingTop(5).BorderTop(1).BorderColor("#c9653a").PaddingTop(5).Row(row =>
             {
-                row.RelativeItem().Text("كله على بعضه:").Bold().FontSize(12);
-                row.ConstantItem(100).AlignRight().Text($"{summary.GrandTotal:F2}").FontSize(12).Bold().FontColor("#c9653a");
+                row.RelativeItem().Text("كله على بعضه:").FontFamily("ArabicFontBold").FontSize(12);
+                row.ConstantItem(100).AlignRight().Text($"{summary.GrandTotal:F2}").FontSize(12).FontFamily("ArabicFontBold").FontColor("#c9653a");
             });
 
             // Settlements
             if (summary.Settlements.Any())
             {
-                column.Item().PaddingTop(20).Text("التصفية (مين يدي مين)").FontSize(14).Bold().FontColor("#c9653a");
+                column.Item().PaddingTop(20).Text("التصفية (مين يدي مين)").FontSize(14).FontFamily("ArabicFontBold").FontColor("#c9653a");
                 column.Item().PaddingTop(5).Column(column =>
                 {
                     foreach (var s in summary.Settlements)
