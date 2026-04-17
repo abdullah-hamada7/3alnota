@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Session } from "../types";
 import { getHistory, deleteSession } from "../../../services/sessionService";
 import { Trash2, Calendar, ChevronRight, History } from "lucide-react";
+import ConfirmModal from "../../../components/shared/ConfirmModal";
 
 export default function HistoryList() {
   const router = useRouter();
@@ -14,11 +15,21 @@ export default function HistoryList() {
     setSessions(getHistory());
   }, []);
 
-  const handleDelete = (e: React.MouseEvent, sessionId: string) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+
+  const handleDeleteClick = (e: React.MouseEvent, sessionId: string) => {
     e.stopPropagation();
-    if (confirm("هل أنت متأكد من مسح هذه النوتة؟ لا يمكن استرجاعها.")) {
-      deleteSession(sessionId);
+    setSessionToDelete(sessionId);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (sessionToDelete) {
+      deleteSession(sessionToDelete);
       setSessions(getHistory());
+      setIsModalOpen(false);
+      setSessionToDelete(null);
     }
   };
 
@@ -57,7 +68,7 @@ export default function HistoryList() {
             <div className="history-item-actions">
               <button
                 className="delete-history-btn"
-                onClick={(e) => handleDelete(e, session.sessionId)}
+                onClick={(e) => handleDeleteClick(e, session.sessionId)}
                 title="مسح"
               >
                 <Trash2 size={16} />
@@ -67,6 +78,14 @@ export default function HistoryList() {
           </div>
         ))}
       </div>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="مسح النوتة؟"
+        message="هل أنت متأكد من مسح هذه النوتة؟ مش هتقدر ترجعها تاني."
+        onConfirm={confirmDelete}
+        onClose={() => setIsModalOpen(false)}
+      />
 
       <style jsx>{`
         .history-section {

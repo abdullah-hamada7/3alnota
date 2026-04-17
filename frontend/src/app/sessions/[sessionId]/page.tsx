@@ -25,6 +25,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import * as sessionService from "@/services/sessionService";
+import ConfirmModal from "@/components/shared/ConfirmModal";
 
 
 const t = {
@@ -110,13 +111,13 @@ const Section = ({
             <ChevronDown size={18} />
           </span>
         )}
+        {expandable && !isExpanded && (
+          <div className="expand-hint">{t.tapToExpand}</div>
+        )}
       </button>
       <div className="section-content">
         {children}
       </div>
-      {expandable && !isExpanded && (
-        <div className="expand-hint">{t.tapToExpand}</div>
-      )}
     </section>
   );
 };
@@ -146,6 +147,18 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const [editParticipantName, setEditParticipantName] = useState("");
   const [newItem, setNewItem] = useState({ name: "", amount: "", participantId: "" });
   const [newCharge, setNewCharge] = useState({ amount: "" });
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => { },
+  });
 
   useEffect(() => {
     params.then(p => {
@@ -246,13 +259,21 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
   const deleteParticipant = async (participantId: string) => {
     if (!sessionId) return;
-    if (!confirm("متأكد إنك عايز تشيل صاحبك ده؟")) return;
-    try {
-      await sessionService.deleteParticipant(sessionId, participantId);
-      await loadSession();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete");
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: "تشيل صاحبك؟",
+      message: "متأكد إنك عايز تشيل صاحبك ده من القائمة؟",
+      onConfirm: async () => {
+        try {
+          await sessionService.deleteParticipant(sessionId, participantId);
+          await loadSession();
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to delete");
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      }
+    });
   };
 
 
@@ -276,13 +297,21 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
   const deleteItem = async (itemId: string) => {
     if (!sessionId) return;
-    if (!confirm("متأكد إنك عايز تحذف الطلب ده؟")) return;
-    try {
-      await sessionService.deleteBillItem(sessionId, itemId);
-      await loadSession();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete");
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: "حذف الطلب؟",
+      message: "متأكد إنك عايز تحذف الطلب ده من النوتة؟",
+      onConfirm: async () => {
+        try {
+          await sessionService.deleteBillItem(sessionId, itemId);
+          await loadSession();
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to delete");
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        }
+      }
+    });
   };
 
 
@@ -420,12 +449,14 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                     placeholder={t.itemName}
                     style={{ flex: 2 }}
                   />
+                  <div className="input-separator" />
                   <input
                     type="number"
                     value={newItem.amount}
                     onChange={(e) => setNewItem({ ...newItem, amount: e.target.value })}
                     placeholder="0"
                     style={{ width: "80px" }}
+                    className="amount-input"
                   />
                   <button className="add-btn" onClick={addItem} disabled={!newItem.participantId}>
                     <Plus size={20} />
@@ -595,6 +626,14 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       </div>
 
       {toast && <div className="toast">{toast}</div>}
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }
