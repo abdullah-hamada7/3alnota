@@ -21,13 +21,10 @@ if (!builder.Environment.IsEnvironment("Testing"))
 
 builder.Services.AddBillSplitterServices(connectionString);
 
-var allowedOriginsConfig = builder.Configuration.GetValue<string>("AllowedOrigins") 
-    ?? "*"; // Default to * for launch
-
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
@@ -84,8 +81,8 @@ app.UseRouting();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-// CORS must be between UseRouting and UseAuthorization
-app.UseCors("AllowAll");
+// CORS must be the VERY FIRST thing after Routing to handle preflights/errors
+app.UseCors();
 
 app.UseSessionAccessResolver();
 
