@@ -147,7 +147,14 @@ static string NormalizePostgresConnectionString(string raw)
             parts.Add($"Password={password}");
 
         if (query.TryGetValue("sslmode", out var sslMode) && !string.IsNullOrWhiteSpace(sslMode))
+        {
             parts.Add($"Ssl Mode={ToNpgsqlEnumValue(sslMode)}");
+            if (sslMode.Equals("require", StringComparison.OrdinalIgnoreCase))
+            {
+                // Often needed for cloud poolers (Neon/Railway) when CA certs aren't in standard locations
+                parts.Add("Trust Server Certificate=true");
+            }
+        }
 
         if (query.TryGetValue("channel_binding", out var channelBinding) && !string.IsNullOrWhiteSpace(channelBinding))
             parts.Add($"Channel Binding={ToNpgsqlEnumValue(channelBinding)}");

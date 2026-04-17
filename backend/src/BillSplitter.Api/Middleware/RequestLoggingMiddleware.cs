@@ -33,8 +33,15 @@ public class RequestLoggingMiddleware
         catch (Exception ex)
         {
             sw.Stop();
-            _logger.LogError(ex, "HTTP {Method} {Path} failed after {Elapsed}ms", 
-                method, path, sw.ElapsedMilliseconds);
+            _logger.LogError(ex, "CRITICAL ERROR: HTTP {Method} {Path} failed after {Elapsed}ms. Error: {Message}", 
+                method, path, sw.ElapsedMilliseconds, ex.Message);
+            
+            // Log inner exception if present
+            if (ex.InnerException != null)
+            {
+                _logger.LogError("Inner Exception: {Message}", ex.InnerException.Message);
+            }
+            
             throw;
         }
     }
