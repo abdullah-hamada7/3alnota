@@ -151,14 +151,14 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
         aria-label="Share session"
       >
         {status === 'connected' ? <Wifi size={20} /> : <Share2 size={20} />}
-        <span>{status === 'connected' ? 'أونلاين' : 'شارك الحسبة'}</span>
+        <span>{status === 'connected' ? 'أونلاين' : 'جمّع الحبايب'}</span>
       </button>
 
       {isOpen && (
         <div className="mp-modal-overlay" onClick={handleClose}>
           <div className="mp-modal" onClick={(e) => e.stopPropagation()}>
             <div className="mp-modal-header">
-              <h2>شارك الحسبة مع صحابك</h2>
+              <h2>جمّع صحابك عالنوتة</h2>
               <button onClick={handleClose} className="mp-close-btn">
                 <X size={24} />
               </button>
@@ -170,7 +170,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
                   <button className="mp-mode-btn" onClick={startHosting}>
                     <Users size={32} className="mp-mode-icon" />
                     <div className="mp-mode-text">
-                      <h3>افتح طاولة</h3>
+                      <h3>افتح ترابيزة</h3>
                       <p>خلي صحابك يدخلوا معاك ويضيفوا طلباتهم</p>
                     </div>
                   </button>
@@ -178,8 +178,8 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
                   <button className="mp-mode-btn" onClick={startJoining}>
                     <Scan size={32} className="mp-mode-icon" />
                     <div className="mp-mode-text">
-                      <h3>ادخل طاولة</h3>
-                      <p>امسح الكود وشارك في الحسبة</p>
+                      <h3>ادخل في لمّة</h3>
+                      <p>صور الكود وشارك في الحسبة</p>
                     </div>
                   </button>
                 </div>
@@ -190,7 +190,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
                   {status === 'connecting' ? (
                     <div className="mp-loading">
                       <Loader2 className="mp-spin" size={48} />
-                      <p>بنجهز الكود...</p>
+                      <p>بنجهّز الكود...</p>
                     </div>
                   ) : (
                     <>
@@ -205,7 +205,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
                         <code>{peerId}</code>
                         {copied ? <Check size={16} /> : <Copy size={16} />}
                       </div>
-                      <p className="mp-hint">خلي صحابك يمسحوا الكود ده عشان يدخلوا معاك</p>
+                      <p className="mp-hint">خلي صحابك يصوروا الكود ده عشان يدخلوا معاك</p>
                     </>
                   )}
                 </div>
@@ -221,7 +221,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
               {status === 'connecting' && mode !== 'host' && (
                 <div className="mp-loading">
                   <Loader2 className="mp-spin" size={48} />
-                  <p>بنكنكت...</p>
+                  <p>بنوصلك دلوقتي...</p>
                 </div>
               )}
             </div>

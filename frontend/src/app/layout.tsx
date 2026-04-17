@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Nunito, El_Messiri } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
+import ConnectivityBanner from '@/components/shared/ConnectivityBanner';
 
 const nunito = Nunito({
   subsets: ['latin'],
@@ -50,6 +51,7 @@ export default function RootLayout({
       <head>
       </head>
       <body>
+        <ConnectivityBanner />
         <div className="mobile-container">
           <main className="flex-grow">
             {children}

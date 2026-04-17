@@ -10,6 +10,9 @@ const withPWA = withPWAInit({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
+  fallbacks: {
+    document: "/~offline",
+  },
 });
 
 const nextConfig: NextConfig = {

@@ -58,7 +58,7 @@ export default function HistoryList() {
           >
             <div className="history-item-info">
               <span className="history-item-name">
-                {session.name || "نوتة بدون اسم"}
+                {session.name || "نوتة من غير اسم"}
               </span>
               <div className="history-item-meta">
                 <Calendar size={12} />

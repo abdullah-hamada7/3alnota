@@ -4,7 +4,7 @@
   "description": "حساب الفواتير وتقسيمها بسهولة وبوضوح",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a1612",
+  "background_color": "#111827",
   "theme_color": "#1e88e5",
   "icons": [
     {

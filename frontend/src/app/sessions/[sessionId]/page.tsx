@@ -62,8 +62,8 @@ const t = {
   draft: "لسه بنجمع",
   calculated: "الحسبة خلصت",
   settled: "كله دفع",
-  notFound: "الحسبة دي مش لاقينها",
-  tapToExpand: "دوس هنا عشان التفاصيل",
+  notFound: "مش لاقي الحسبة دي",
+  tapToExpand: "دوس عشان تشوف التفاصيل",
 };
 
 interface ExpandedSections {
@@ -312,7 +312,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     setConfirmModal({
       isOpen: true,
       title: "تشيل صاحبك؟",
-      message: "متأكد إنك عايز تشيل صاحبك ده من القائمة؟",
+      message: "متأكد إنك عايز تمسح صاحبك ده؟",
       onConfirm: async () => {
         try {
           await sessionService.deleteParticipant(sessionId, participantId);
@@ -355,8 +355,8 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     if (!sessionId) return;
     setConfirmModal({
       isOpen: true,
-      title: "حذف الطلب؟",
-      message: "متأكد إنك عايز تحذف الطلب ده من النوتة؟",
+      title: "تمسح الطلب؟",
+      message: "متأكد إنك عايز تمسح الطلب ده من النوتة؟",
       onConfirm: async () => {
         try {
           await sessionService.deleteBillItem(sessionId, itemId);
