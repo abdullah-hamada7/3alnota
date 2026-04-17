@@ -25,7 +25,9 @@ import {
   CheckCircle2
 } from "lucide-react";
 import * as sessionService from "@/services/sessionService";
+import LocalStorageService from "@/services/localStorageService";
 import ConfirmModal from "@/components/shared/ConfirmModal";
+import MultiplayerMenu, { MultiplayerMenuHandle } from "@/features/session/components/MultiplayerMenu";
 
 
 const t = {
@@ -138,6 +140,8 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     settlements: false,
   });
   const [animatingSection, setAnimatingSection] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const multiplayerRef = useRef<MultiplayerMenuHandle>(null);
 
   const [newParticipantName, setNewParticipantName] = useState("");
   const [editingParticipant, setEditingParticipant] = useState<string | null>(null);
@@ -182,6 +186,51 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
     }
   };
 
+  const handleRemoteStateUpdate = (remoteSession: Session) => {
+    setSession(remoteSession);
+    setIsCalculated(remoteSession.status === "Calculated" || remoteSession.status === "Settled");
+    // Persist to local storage so the joiner's session survives a refresh
+    LocalStorageService.saveSession(remoteSession);
+  };
+
+  const handleRemoteAction = async (action: string, payload: any) => {
+    if (!sessionId) return;
+    setIsSyncing(true);
+    try {
+      switch (action) {
+        case 'ADD_PARTICIPANT':
+          await sessionService.addParticipant(sessionId, payload.name);
+          break;
+        case 'ADD_ITEM':
+          await sessionService.addBillItem(sessionId, payload.name, payload.amount, undefined, payload.assignments);
+          break;
+        case 'DELETE_ITEM':
+          await sessionService.deleteBillItem(sessionId, payload.itemId);
+          break;
+        case 'DELETE_PARTICIPANT':
+          await sessionService.deleteParticipant(sessionId, payload.participantId);
+          break;
+        case 'UPDATE_PARTICIPANT':
+          await sessionService.updateParticipant(sessionId, payload.participantId, payload.name);
+          break;
+        case 'REPLACE_CHARGES':
+          await sessionService.replaceCharges(sessionId, payload.charges);
+          break;
+        case 'REPLACE_PAYMENTS':
+          await sessionService.replacePayments(sessionId, payload.payments);
+          break;
+        case 'CALCULATE':
+          await sessionService.calculateSession(sessionId);
+          break;
+      }
+      await loadSession();
+    } catch (err) {
+      console.error("Remote action failed", err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
 
   const toggleSection = (section: keyof ExpandedSections) => {
     setAnimatingSection(section);
@@ -211,6 +260,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       setIsCalculated(true);
       setExpanded({ participants: true, items: false, charges: false, payments: false, results: true, settlements: true });
       await loadSession();
+      multiplayerRef.current?.sendAction('CALCULATE', {});
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to calculate");
     }
@@ -223,6 +273,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       await sessionService.replacePayments(sessionId, payments);
       await loadSession();
       showToast("اتسجلت تمام ✅");
+      multiplayerRef.current?.sendAction('REPLACE_PAYMENTS', { payments });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save payments");
     }
@@ -235,6 +286,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       await sessionService.addParticipant(sessionId, newParticipantName);
       setNewParticipantName("");
       await loadSession();
+      multiplayerRef.current?.sendAction('ADD_PARTICIPANT', { name: newParticipantName });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add");
     }
@@ -248,6 +300,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       setEditingParticipant(null);
       setEditParticipantName("");
       await loadSession();
+      multiplayerRef.current?.sendAction('UPDATE_PARTICIPANT', { participantId, name: editParticipantName });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update");
     }
@@ -265,6 +318,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           await sessionService.deleteParticipant(sessionId, participantId);
           await loadSession();
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
+          multiplayerRef.current?.sendAction('DELETE_PARTICIPANT', { participantId });
         } catch (err) {
           setError(err instanceof Error ? err.message : "Failed to delete");
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
@@ -286,6 +340,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       );
       setNewItem({ name: "", amount: "", participantId: "" });
       await loadSession();
+      multiplayerRef.current?.sendAction('ADD_ITEM', { 
+        name: newItem.name, 
+        amount: newItem.amount, 
+        assignments: [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }] 
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add item");
     }
@@ -303,6 +362,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           await sessionService.deleteBillItem(sessionId, itemId);
           await loadSession();
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
+          multiplayerRef.current?.sendAction('DELETE_ITEM', { itemId });
         } catch (err) {
           setError(err instanceof Error ? err.message : "Failed to delete");
           setConfirmModal(prev => ({ ...prev, isOpen: false }));
@@ -315,9 +375,11 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   const addCharge = async () => {
     if (!sessionId || !newCharge.amount) return;
     try {
-      await sessionService.replaceCharges(sessionId, [{ type: "both", amount: newCharge.amount }]);
+      const charges = [{ type: "both", amount: newCharge.amount }];
+      await sessionService.replaceCharges(sessionId, charges);
       setNewCharge({ amount: "" });
       await loadSession();
+      multiplayerRef.current?.sendAction('REPLACE_CHARGES', { charges });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add charge");
     }
@@ -623,6 +685,13 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       </div>
 
       {toast && <div className="toast">{toast}</div>}
+
+      <MultiplayerMenu 
+        ref={multiplayerRef}
+        session={session}
+        onRemoteAction={handleRemoteAction}
+        onRemoteStateUpdate={handleRemoteStateUpdate}
+      />
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
