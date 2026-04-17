@@ -8,7 +8,7 @@ public sealed class SettlementTransaction
     public Guid SessionId { get; private set; }
     public Guid FromParticipantId { get; private set; }
     public Guid ToParticipantId { get; private set; }
-    public Money Amount { get; private set; }
+    public required Money Amount { get; private set; }
     public int Sequence { get; private set; }
 
     private SettlementTransaction() { }

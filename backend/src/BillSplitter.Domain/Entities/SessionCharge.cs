@@ -7,7 +7,7 @@ public class SessionCharge
     public Guid Id { get; private set; }
     public Guid SessionId { get; private set; }
     public ChargeType Type { get; private set; }
-    public Money Amount { get; private set; }
+    public required Money Amount { get; private set; }
 
     private Session? _session;
 

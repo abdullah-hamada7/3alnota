@@ -8,11 +8,11 @@ public class Participant
     public Guid SessionId { get; private set; }
     public string DisplayName { get; private set; } = string.Empty;
     public int SortOrder { get; private set; }
-    public Money PaidAmount { get; private set; }
-    public Money CalculatedSubtotal { get; private set; }
-    public Money AllocatedCharges { get; private set; }
-    public Money FinalAmount { get; private set; }
-    public Money Balance { get; private set; }
+    public required Money PaidAmount { get; private set; }
+    public required Money CalculatedSubtotal { get; private set; }
+    public required Money AllocatedCharges { get; private set; }
+    public required Money FinalAmount { get; private set; }
+    public required Money Balance { get; private set; }
 
     private Session? _session;
     
