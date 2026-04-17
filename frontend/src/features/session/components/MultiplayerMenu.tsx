@@ -47,7 +47,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
   useEffect(() => {
     return () => {
       syncService.current?.destroy();
-      try { scannerRef.current?.clear(); } catch (_) {}
+      try { scannerRef.current?.clear(); } catch (_) { }
     };
   }, []);
 
@@ -99,7 +99,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
       scanner.render(
         (decodedText) => {
           connectToPeer(decodedText);
-          try { scanner.clear(); } catch (_) {}
+          try { scanner.clear(); } catch (_) { }
         },
         (_error) => { /* scan errors are expected, ignore */ }
       );
@@ -140,7 +140,7 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
   const handleClose = () => {
     setIsOpen(false);
     if (mode !== 'host') setMode('idle'); // keep host alive when closing modal
-    try { scannerRef.current?.clear(); } catch (_) {}
+    try { scannerRef.current?.clear(); } catch (_) { }
   };
 
   return (
@@ -214,7 +214,32 @@ const MultiplayerMenu = forwardRef<MultiplayerMenuHandle, MultiplayerMenuProps>(
               {mode === 'join' && (
                 <div className="mp-join-display">
                   <div id="qr-reader" style={{ width: '100%' }} />
-                  <p className="mp-hint">وجه الكاميرا ناحية كود صاحبك</p>
+                  <div className="mp-divider">
+                    <span>أو</span>
+                  </div>
+                  <div className="mp-manual-join">
+                    <input
+                      type="text"
+                      placeholder="اكتب كود الحسبة هنا"
+                      className="mp-id-input"
+                      id="manual-peer-id"
+                    />
+                    <button
+                      className="mp-join-submit"
+                      onClick={() => {
+                        const input = document.getElementById('manual-peer-id') as HTMLInputElement;
+                        const val = input?.value.trim();
+                        if (!val) {
+                          alert("اكتب الكود الأول يا ريس ! ✍️");
+                          return;
+                        }
+                        connectToPeer(val);
+                      }}
+                    >
+                      دخول
+                    </button>
+                  </div>
+                  <p className="mp-hint">وجه الكاميرا ناحية كود صاحبك أو اكتب الكود يدوي</p>
                 </div>
               )}
 

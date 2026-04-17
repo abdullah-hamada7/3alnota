@@ -15,12 +15,22 @@ export default function HomePage() {
 
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!sessionName.trim()) {
+      setError("اكتب اسم للحسبة عشان متنسهاش");
+      return;
+    }
+
+    if (sessionName.length > 50) {
+      setError("اسم الحسبة طويل شوية، خليه أقل من ٥٠ حرف");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await sessionService.createSession(sessionName);
-
+      const response = await sessionService.createSession(sessionName.trim());
       router.push(`/sessions/${response.sessionId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create session");

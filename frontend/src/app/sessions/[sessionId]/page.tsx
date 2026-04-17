@@ -281,12 +281,29 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
 
   const addParticipant = async () => {
-    if (!sessionId || !newParticipantName.trim()) return;
+    if (!sessionId) return;
+    
+    const name = newParticipantName.trim();
+    if (!name) {
+      showToast("لازم تكتب اسم الأول 😅");
+      return;
+    }
+
+    if (name.length > 30) {
+      showToast("الاسم طويل أوي، خليه أقل من ٣٠ حرف");
+      return;
+    }
+
+    if (session?.participants.some(p => p.displayName.toLowerCase() === name.toLowerCase())) {
+      showToast("الاسم ده موجود قبل كده، جرب تدلع صاحبك باسم تاني 😉");
+      return;
+    }
+
     try {
-      await sessionService.addParticipant(sessionId, newParticipantName);
+      await sessionService.addParticipant(sessionId, name);
       setNewParticipantName("");
       await loadSession();
-      multiplayerRef.current?.sendAction('ADD_PARTICIPANT', { name: newParticipantName });
+      multiplayerRef.current?.sendAction('ADD_PARTICIPANT', { name });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add");
     }
@@ -294,13 +311,31 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
 
   const updateParticipant = async (participantId: string) => {
-    if (!sessionId || !editParticipantName.trim()) return;
+    if (!sessionId) return;
+    
+    const name = editParticipantName.trim();
+    if (!name) {
+      showToast("ماينفعش تسيب الاسم فاضي 😕");
+      return;
+    }
+
+    if (name.length > 30) {
+      showToast("الاسم طويل أوي، خليه أقل من ٣٠ حرف");
+      return;
+    }
+
+    // Check for duplicates (excluding the current participant being edited)
+    if (session?.participants.some(p => p.participantId !== participantId && p.displayName.toLowerCase() === name.toLowerCase())) {
+      showToast("الاسم ده عند حد تاني من صحابك، خليه مميز 😉");
+      return;
+    }
+
     try {
-      await sessionService.updateParticipant(sessionId, participantId, editParticipantName);
+      await sessionService.updateParticipant(sessionId, participantId, name);
       setEditingParticipant(null);
       setEditParticipantName("");
       await loadSession();
-      multiplayerRef.current?.sendAction('UPDATE_PARTICIPANT', { participantId, name: editParticipantName });
+      multiplayerRef.current?.sendAction('UPDATE_PARTICIPANT', { participantId, name });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update");
     }
@@ -329,21 +364,41 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
 
   const addItem = async () => {
-    if (!sessionId || !newItem.name || !newItem.amount || !newItem.participantId) return;
+    if (!sessionId) return;
+    
+    const name = newItem.name.trim();
+    const amountStr = newItem.amount.trim();
+    const pid = newItem.participantId;
+
+    if (!name) {
+      showToast("اكتب اسم الحاجة اللي انطلبت 🍔");
+      return;
+    }
+
+    if (!amountStr || parseFloat(amountStr) <= 0) {
+      showToast("حط سعر حقيقي للحاجة دي 💰");
+      return;
+    }
+
+    if (!pid) {
+      showToast("مين اللي طلب الحاجة دي؟ 🤔");
+      return;
+    }
+
     try {
       await sessionService.addBillItem(
         sessionId,
-        newItem.name,
-        newItem.amount,
+        name,
+        amountStr,
         undefined,
-        [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }]
+        [{ participantId: pid, ratioNumerator: 1, ratioDenominator: 1 }]
       );
       setNewItem({ name: "", amount: "", participantId: "" });
       await loadSession();
       multiplayerRef.current?.sendAction('ADD_ITEM', { 
-        name: newItem.name, 
-        amount: newItem.amount, 
-        assignments: [{ participantId: newItem.participantId, ratioNumerator: 1, ratioDenominator: 1 }] 
+        name, 
+        amount: amountStr, 
+        assignments: [{ participantId: pid, ratioNumerator: 1, ratioDenominator: 1 }] 
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to add item");
@@ -373,9 +428,16 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
 
 
   const addCharge = async () => {
-    if (!sessionId || !newCharge.amount) return;
+    if (!sessionId) return;
+    const amount = newCharge.amount.trim();
+    
+    if (!amount || parseFloat(amount) < 0) {
+      showToast("حط مبلغ صح للضريبة أو الخدمة 🧾");
+      return;
+    }
+
     try {
-      const charges = [{ type: "both", amount: newCharge.amount }];
+      const charges = [{ type: "both", amount }];
       await sessionService.replaceCharges(sessionId, charges);
       setNewCharge({ amount: "" });
       await loadSession();
@@ -780,6 +842,13 @@ function PaymentEditor({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const invalid = Object.values(payments).some(val => parseFloat(val) < 0);
+    if (invalid) {
+      alert("حط مبالغ موجبة بس يا بطل! 💸");
+      return;
+    }
+
     setIsLoading(true);
     const paymentUpdates = Object.entries(payments).map(([participantId, paidAmount]) => ({
       participantId,
