@@ -253,7 +253,18 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   };
 
   const calculateSession = async () => {
-    if (!sessionId) return;
+    if (!sessionId || !session) return;
+
+    if (session.participants.length === 0) {
+      showToast("ضيف صحابك الأول عشان نعرف مين اللي هيدفع! 👥");
+      return;
+    }
+
+    if (session.items.length === 0) {
+      showToast("النوتة لسه فاضية، زود الطلبات الأول 🍔");
+      return;
+    }
+
     try {
       const result = await sessionService.calculateSession(sessionId);
       setCalculateResult(result);
