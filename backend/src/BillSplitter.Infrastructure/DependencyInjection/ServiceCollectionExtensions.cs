@@ -1,3 +1,4 @@
+using BillSplitter.Application.Interfaces;
 using BillSplitter.Application.Services.Sessions;
 using BillSplitter.Domain.Services;
 using BillSplitter.Infrastructure.Persistence;
