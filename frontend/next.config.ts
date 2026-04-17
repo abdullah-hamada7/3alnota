@@ -3,8 +3,13 @@ import type { NextConfig } from "next";
 
 const withPWA = withPWAInit({
   dest: "public",
+  // PWA is disabled in development by default. 
+  // To test offline functionality, either run a production build or set this to false.
   disable: process.env.NODE_ENV === "development",
   register: true,
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
 });
 
 const nextConfig: NextConfig = {

@@ -1,6 +1,19 @@
 import type { Metadata, Viewport } from 'next';
+import { Nunito, El_Messiri } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
+
+const nunito = Nunito({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-nunito',
+});
+
+const elMessiri = El_Messiri({
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-el-messiri',
+});
 
 
 export const metadata: Metadata = {
@@ -33,11 +46,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" className={`${nunito.variable} ${elMessiri.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=El+Messiri:wght@400;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
         <div className="mobile-container">
