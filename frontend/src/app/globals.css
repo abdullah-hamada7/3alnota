@@ -731,8 +731,8 @@ html, body {
   box-shadow: 0 4px 12px rgba(201, 168, 108, 0.3);
 }
 
-/* Export PDF button - new version */
-.export-pdf-btn {
+/* Save as Image button */
+.save-image-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -750,16 +750,16 @@ html, body {
   transition: all 0.2s ease;
 }
 
-.export-pdf-btn:hover {
+.save-image-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(201, 168, 108, 0.4);
 }
 
-.export-pdf-btn:active {
+.save-image-btn:active {
   transform: translateY(0);
 }
 
-.export-pdf-btn:disabled {
+.save-image-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;

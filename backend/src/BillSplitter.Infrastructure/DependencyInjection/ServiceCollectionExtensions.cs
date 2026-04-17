@@ -1,8 +1,6 @@
-using BillSplitter.Application.Interfaces;
 using BillSplitter.Application.Services.Sessions;
 using BillSplitter.Domain.Services;
 using BillSplitter.Infrastructure.Persistence;
-using BillSplitter.Infrastructure.Pdf;
 using BillSplitter.Infrastructure.Repositories;
 using BillSplitter.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +14,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ISessionRepository, SessionRepository>();
         services.AddScoped<ISessionTokenService, SessionTokenService>();
-        services.AddSingleton<ISessionPdfService, SessionSummaryPdfService>();
         services.AddScoped<SettlementCalculator>();
         services.AddScoped<SessionCalculationService>();
         

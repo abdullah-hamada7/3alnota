@@ -8,53 +8,18 @@ namespace BillSplitter.Api.Controllers;
 [ApiController]
 public class ExportsController : ControllerBase
 {
-    private readonly ISessionPdfService _pdfService;
     private readonly ISessionRepository _repository;
     private readonly ISessionTokenService _tokenService;
     private readonly SettlementCalculator _settlementCalculator;
 
     public ExportsController(
-        ISessionPdfService pdfService, 
         ISessionRepository repository, 
         ISessionTokenService tokenService,
         SettlementCalculator settlementCalculator)
     {
-        _pdfService = pdfService;
         _repository = repository;
         _tokenService = tokenService;
         _settlementCalculator = settlementCalculator;
-    }
-
-    [HttpGet("api/sessions/{sessionId}/export/pdf")]
-    [Produces("application/pdf")]
-    public async Task<IActionResult> ExportPdf(string sessionId, [FromQuery] string? viewerToken)
-    {
-        if (!Guid.TryParse(sessionId, out var sessionGuid))
-            return BadRequest("Invalid session ID");
-
-        var session = await _repository.GetByIdAsync(sessionGuid);
-        if (session == null)
-            return NotFound();
-
-        if (!string.IsNullOrEmpty(viewerToken))
-        {
-            var validation = _tokenService.ValidateToken(viewerToken, sessionGuid);
-            if (!validation.isValid)
-                return Unauthorized();
-        }
-
-        if (session.Status != Domain.Entities.SessionStatus.Calculated && 
-            session.Status != Domain.Entities.SessionStatus.Settled)
-            return BadRequest("Session must be calculated before export");
-
-        var summary = MapToSessionSummary(session, _settlementCalculator);
-        var pdfBytes = _pdfService.GenerateSessionSummaryPdf(summary);
-
-        var fileName = string.IsNullOrEmpty(session.Name) 
-            ? $"فاتورة_{session.Id}.pdf" 
-            : $"{session.Name}.pdf";
-
-        return File(pdfBytes, "application/pdf", fileName);
     }
 
     private static SessionSummary MapToSessionSummary(Domain.Entities.Session session, SettlementCalculator settlementCalculator)

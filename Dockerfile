@@ -28,12 +28,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     libfontconfig1 \
     curl \
-    && mkdir -p /app/fonts \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Regular.ttf -o /app/fonts/ElMessiri-Regular.ttf \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Medium.ttf -o /app/fonts/ElMessiri-Medium.ttf \
-    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Bold.ttf -o /app/fonts/ElMessiri-Bold.ttf \
-    && chown -R app:app /app/fonts \
-    && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=publish /app/publish .
