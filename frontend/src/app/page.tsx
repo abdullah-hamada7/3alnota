@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import apiClient from "@/services/apiClient";
 import { CreateSessionResponse } from "@/features/session/types";
 import WakeUpCheck from "@/components/WakeUpCheck";
+import { PlusCircle } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -62,7 +63,12 @@ export default function HomePage() {
             disabled={isLoading}
             className="create-btn"
           >
-            {isLoading ? "..." : "➕ افتح النوتة"}
+            {isLoading ? "..." : (
+              <>
+                <PlusCircle size={20} />
+                <span>افتح النوتة</span>
+              </>
+            )}
           </button>
         </form>
 

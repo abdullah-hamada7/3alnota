@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 
+import { Search, ShieldAlert, AlertOctagon } from 'lucide-react';
+
 interface SessionErrorStateProps {
   title?: string;
   message?: string;
@@ -20,16 +22,19 @@ const SessionErrorState: React.FC<SessionErrorStateProps> = ({
         return {
           t: 'الحسبة دي مش موجودة!',
           m: 'دورنا عليها في كل حتة وملقناش حاجة. اتأكد من اللينك يا معلم.',
+          icon: <Search size={64} className="text-slate-400" />
         };
       case 'unauthorized':
         return {
           t: 'مش بتاعتك يا بطل',
           m: 'اللينك ده تقريباً للمعاينة بس، أو محتاج إذن دخول.',
+          icon: <ShieldAlert size={64} className="text-error" />
         };
       default:
         return {
           t: 'في حاجة باظت!',
           m: 'السيرفر شكله مهنج شوية، جرب ريفريش كدة وربنا يسهل.',
+          icon: <AlertOctagon size={64} className="text-error" />
         };
     }
   };
@@ -37,12 +42,13 @@ const SessionErrorState: React.FC<SessionErrorStateProps> = ({
   const content = {
     t: title || getDefaultContent().t,
     m: message || getDefaultContent().m,
+    icon: getDefaultContent().icon
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="text-6xl mb-6 select-none">
-        {type === 'not-found' ? '🔍' : type === 'unauthorized' ? '🚫' : '💥'}
+      <div className="mb-6 select-none">
+        {content.icon}
       </div>
       <h1 className="text-3xl font-bold text-slate-900 mb-4 tracking-tight">
         {content.t}

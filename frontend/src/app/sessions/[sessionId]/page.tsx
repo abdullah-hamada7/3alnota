@@ -6,6 +6,27 @@ import apiClient from "@/services/apiClient";
 import { Session, Participant, BillItem } from "@/features/session/types";
 import SaveAsImage from "@/components/sessions/SaveAsImage";
 import SessionErrorState from "@/features/session/components/SessionErrorState";
+import {
+  Users,
+  UtensilsCrossed,
+  Receipt,
+  Banknote,
+  BarChart3,
+  ArrowRightLeft,
+  Plus,
+  PlusCircle,
+  X,
+  Pencil,
+  ArrowLeft,
+  ChevronDown,
+  QrCode,
+  Smartphone,
+  Copy,
+  Check,
+  FileText,
+  CheckCircle2,
+  RefreshCw
+} from "lucide-react";
 
 const t = {
   appName: "عالنوتة",
@@ -67,7 +88,7 @@ const Section = ({
 }: {
   title: string;
   sectionKey: keyof ExpandedSections;
-  icon: string;
+  icon: React.ReactNode;
   children: React.ReactNode;
   count?: number;
   expandable?: boolean;
@@ -88,7 +109,9 @@ const Section = ({
           {count > 0 && <span className="section-count">{count}</span>}
         </span>
         {expandable && (
-          <span className={`expand-icon ${isExpanded ? 'rotated' : ''}`}>▾</span>
+          <span className={`expand-icon ${isExpanded ? 'rotated' : ''}`}>
+            <ChevronDown size={18} />
+          </span>
         )}
       </button>
       <div className="section-content">
@@ -187,7 +210,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
       ? `${window.location.origin}/sessions/${session.sessionId}?token=${viewerToken}`
       : `${window.location.origin}/sessions/${session.sessionId}`;
     await navigator.clipboard.writeText(url);
-    showToast("✅ اللينك اتنسخ!");
+    showToast("اللينك اتنسخ!");
   };
 
   const showToast = (msg: string) => {
@@ -353,17 +376,27 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
   return (
     <div className="arabic-container">
       <header className="app-header">
-        <button className="header-icon" onClick={handleBack} aria-label={t.back}>←</button>
+        <button className="header-icon" onClick={handleBack} aria-label={t.back}>
+          <ArrowLeft size={20} />
+        </button>
         <h1>{session.name || t.appName}</h1>
         <button className="header-icon" onClick={handleShowQR} aria-label={t.showQR}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect width="5" height="5" x="3" y="3" rx="1" /><rect width="5" height="5" x="16" y="3" rx="1" /><rect width="5" height="5" x="3" y="16" rx="1" /><path d="M21 16h-3a2 2 0 0 0-2 2v3" /><path d="M21 21v.01" /><path d="M12 7v3a2 2 0 0 1-2 2H7" /><path d="M3 12h.01" /><path d="M12 3h.01" /><path d="M12 16v.01" /><path d="M16 12h1" /><path d="M21 12v.01" /><path d="M12 21v-1" />
-          </svg>
+          <QrCode size={20} />
         </button>
       </header>
 
       <div className="status-badge" data-status={session.status}>
-        {session.status === "Draft" ? "📝 لسه بنجهز" : session.status === "Calculated" || session.status === "Settled" ? "✅ خلصت" : "📋"}
+        {session.status === "Draft" ? (
+          <>
+            <FileText size={14} />
+            <span>لسه بنجهز</span>
+          </>
+        ) : session.status === "Calculated" || session.status === "Settled" ? (
+          <>
+            <CheckCircle2 size={14} />
+            <span>خلصت</span>
+          </>
+        ) : null}
       </div>
 
       {toast && <div className="toast">{toast}</div>}
@@ -384,7 +417,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           </div>
         )}
 
-        <Section title={t.participants} sectionKey="participants" icon="👥" count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
+        <Section title={t.participants} sectionKey="participants" icon={<Users size={18} />} count={session.participants.length} expandable={session.participants.length > 0} isExpanded={expanded.participants} isAnimating={animatingSection === "participants"} onToggle={toggleSection}>
           {isOrganizer && session.status === "Draft" && (
             <div className="input-group">
               <input
@@ -393,7 +426,9 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                 onChange={(e) => setNewParticipantName(e.target.value)}
                 placeholder={t.participantName}
               />
-              <button className="add-btn" onClick={addParticipant}>+</button>
+              <button className="add-btn" onClick={addParticipant}>
+                <Plus size={20} />
+              </button>
             </div>
           )}
 
@@ -422,7 +457,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           </div>
         </Section>
 
-        <Section title={t.items} sectionKey="items" icon="🍽️" count={session.items.length} expandable isExpanded={expanded.items} isAnimating={animatingSection === "items"} onToggle={toggleSection}>
+        <Section title={t.items} sectionKey="items" icon={<UtensilsCrossed size={18} />} count={session.items.length} expandable isExpanded={expanded.items} isAnimating={animatingSection === "items"} onToggle={toggleSection}>
           {isOrganizer && session.status === "Draft" && (
             <>
               <div className="input-group">
@@ -440,7 +475,9 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                   placeholder="0"
                   style={{ width: "80px" }}
                 />
-                <button className="add-btn" onClick={addItem} disabled={!newItem.participantId}>+</button>
+                <button className="add-btn" onClick={addItem} disabled={!newItem.participantId}>
+                  <Plus size={20} />
+                </button>
               </div>
               <select
                 value={newItem.participantId}
@@ -469,7 +506,9 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                   <div className="item-right">
                     <span className="amount">{item.amount}</span>
                     {isOrganizer && session.status === "Draft" && (
-                      <button className="delete-btn" onClick={() => deleteItem(item.itemId)}>×</button>
+                      <button className="delete-btn" onClick={() => deleteItem(item.itemId)}>
+                        <X size={16} />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -484,7 +523,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           </div>
         </Section>
 
-        <Section title={t.taxService} sectionKey="charges" icon="💰" count={session.charges.length} expandable isExpanded={expanded.charges} isAnimating={animatingSection === "charges"} onToggle={toggleSection}>
+        <Section title={t.taxService} sectionKey="charges" icon={<Receipt size={18} />} count={session.charges.length} expandable isExpanded={expanded.charges} isAnimating={animatingSection === "charges"} onToggle={toggleSection}>
           {isOrganizer && session.status === "Draft" && (
             <div className="input-group">
               <input
@@ -493,7 +532,9 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                 onChange={(e) => setNewCharge({ amount: e.target.value })}
                 placeholder={t.chargeAmount}
               />
-              <button className="add-btn" onClick={addCharge}>+</button>
+              <button className="add-btn" onClick={addCharge}>
+                <Plus size={20} />
+              </button>
             </div>
           )}
 
@@ -514,7 +555,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         </Section>
 
         {isOrganizer && session.status === "Draft" && session.participants.length > 0 && (
-          <Section title={t.payments} sectionKey="payments" icon="💵" expandable isExpanded={expanded.payments} isAnimating={animatingSection === "payments"} onToggle={toggleSection}>
+          <Section title={t.payments} sectionKey="payments" icon={<Banknote size={18} />} expandable isExpanded={expanded.payments} isAnimating={animatingSection === "payments"} onToggle={toggleSection}>
             <PaymentEditor
               participants={session.participants}
               onSubmit={replacePayments}
@@ -523,7 +564,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         )}
 
         {isCalculated && (
-          <Section title="النتيجة" sectionKey="results" icon="📊" expandable isExpanded={expanded.results} isAnimating={animatingSection === "results"} onToggle={toggleSection}>
+          <Section title="النتيجة" sectionKey="results" icon={<BarChart3 size={18} />} expandable isExpanded={expanded.results} isAnimating={animatingSection === "results"} onToggle={toggleSection}>
             <div className="results-list">
               {session.participants.map(p => {
                 const balance = parseFloat(p.balance);
@@ -534,7 +575,22 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                       <div>المجموع: <strong>{p.finalAmount} {t.currency}</strong></div>
                       <div>مدفوع: {p.paidAmount} {t.currency}</div>
                       <div className={`result-balance ${balance > 0 ? "gets-back" : balance < 0 ? "owes" : ""}`}>
-                        {balance > 0 ? `✓ ليه ${balance.toFixed(0)}` : balance < 0 ? `● عليه ${Math.abs(balance).toFixed(0)}` : "✓ خلاص"}
+                        {balance > 0 ? (
+                          <>
+                            <Check size={14} />
+                            <span>ليه {balance.toFixed(0)}</span>
+                          </>
+                        ) : balance < 0 ? (
+                          <>
+                            <div className="dot" />
+                            <span>عليه {Math.abs(balance).toFixed(0)}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Check size={14} />
+                            <span>خلاص</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -545,7 +601,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
         )}
 
         {isCalculated && settlements.length > 0 && (
-          <Section title="التسوية" sectionKey="settlements" icon="🔄" expandable isExpanded={expanded.settlements} isAnimating={animatingSection === "settlements"} onToggle={toggleSection}>
+          <Section title="التسوية" sectionKey="settlements" icon={<ArrowRightLeft size={18} />} expandable isExpanded={expanded.settlements} isAnimating={animatingSection === "settlements"} onToggle={toggleSection}>
             <div className="settlements-list">
               {settlements.map((s, idx) => {
                 const fromName = session.participants.find(p => p.participantId === s.fromParticipantId)?.displayName || "";
@@ -553,7 +609,7 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
                 return (
                   <div key={idx} className="settlement-item">
                     <span className="from">{fromName}</span>
-                    <span className="arrow">→</span>
+                    <ArrowLeft size={16} className="owes-arrow" />
                     <span className="to">{toName}</span>
                     <span className="amount">{s.amount.toFixed(0)} {t.currency}</span>
                   </div>
@@ -577,7 +633,8 @@ export default function SessionPage({ params }: { params: Promise<{ sessionId: s
           ) : (
             <>
               <button className="refresh-btn" onClick={loadSession}>
-                تحديث
+                <RefreshCw size={18} />
+                <span>تحديث</span>
               </button>
               {isCalculated && (
                 <SaveAsImage containerRef={receiptRef} sessionName={session.name} />
@@ -637,16 +694,24 @@ function ParticipantRow({
             value={editName}
             onChange={(e) => onEditNameChange(e.target.value)}
           />
-          <button onClick={onSaveEdit}>✓</button>
-          <button onClick={onCancelEdit}>×</button>
+          <button onClick={onSaveEdit} className="save-edit-btn">
+            <Check size={16} />
+          </button>
+          <button onClick={onCancelEdit} className="cancel-edit-btn">
+            <X size={16} />
+          </button>
         </div>
       ) : (
         <>
           <span className="name">{participant.displayName}</span>
           {isOrganizer && isDraft && (
             <div className="actions">
-              <button className="edit-btn" onClick={onStartEdit}>✎</button>
-              <button className="delete-btn" onClick={onDelete}>×</button>
+              <button className="edit-btn" onClick={onStartEdit}>
+                <Pencil size={14} />
+              </button>
+              <button className="delete-btn" onClick={onDelete}>
+                <X size={14} />
+              </button>
             </div>
           )}
         </>
@@ -723,11 +788,17 @@ function QRModal({ url, onClose, onCopy }: { url: string; onClose: () => void; o
   return (
     <div className="qr-modal-overlay" onClick={onClose}>
       <div className="qr-modal" onClick={e => e.stopPropagation()}>
-        <h3>📱 امسح للدخول</h3>
+        <div className="qr-header">
+          <Smartphone size={24} />
+          <h3>امسح للدخول</h3>
+        </div>
         <canvas ref={canvasRef}></canvas>
         <div className="qr-url">{url}</div>
         <div className="qr-actions">
-          <button className="qr-copy-btn" onClick={onCopy}>📋 نسخ الرابط</button>
+          <button className="qr-copy-btn" onClick={onCopy}>
+            <Copy size={18} />
+            <span>نسخ الرابط</span>
+          </button>
           <button className="qr-close-btn" onClick={onClose}>إغلاق</button>
         </div>
       </div>

@@ -3,6 +3,8 @@
 import React, { useState, RefObject } from 'react';
 import { toPng } from 'html-to-image';
 
+import { Camera } from 'lucide-react';
+
 interface SaveAsImageProps {
   containerRef: RefObject<HTMLDivElement | null>;
   sessionName?: string | null;
@@ -49,7 +51,9 @@ const SaveAsImage: React.FC<SaveAsImageProps> = ({ containerRef, sessionName }) 
       disabled={isExporting}
       className="save-image-btn"
     >
-      <span className="export-icon">📸</span>
+      <span className="export-icon">
+        <Camera size={20} />
+      </span>
       {isExporting ? 'بنصور...' : 'حفظ كصورة'}
     </button>
   );

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
+    "lucide-react": "^1.8.0",
     "next": "latest",
     "qrcode": "^1.5.3",
     "react": "latest",

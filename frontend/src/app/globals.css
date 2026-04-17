@@ -116,6 +116,7 @@ html, body {
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  line-height: 0;
 }
 
 .header-icon:hover {
@@ -213,7 +214,10 @@ html, body {
 }
 
 .section-icon {
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-copper);
 }
 
 .section-count {
@@ -227,7 +231,9 @@ html, body {
 
 .expand-icon {
   color: var(--text-muted);
-  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.3s ease;
 }
 
@@ -318,6 +324,9 @@ html, body {
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-btn:hover {
@@ -377,6 +386,9 @@ html, body {
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .participant-item .edit-btn:hover {
@@ -441,6 +453,9 @@ html, body {
   cursor: pointer;
   font-size: 1rem;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .item-right .delete-btn:hover {
@@ -502,6 +517,10 @@ html, body {
   background: rgba(93, 155, 107, 0.15);
   color: var(--success);
   border: 1px solid rgba(93, 155, 107, 0.3);
+}
+
+.status-badge span {
+  padding-bottom: 2px;
 }
 
 /* Payment form */
@@ -621,6 +640,19 @@ html, body {
   color: var(--error);
 }
 
+.result-balance {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.result-balance .dot {
+  width: 8px;
+  height: 8px;
+  background: var(--error);
+  border-radius: 50%;
+}
+
 /* Settlements */
 .settlements-list {
   display: flex;
@@ -636,6 +668,11 @@ html, body {
   padding: var(--space-md);
   border-radius: var(--radius-md);
   border-right: 3px solid var(--accent-gold);
+}
+
+.owes-arrow {
+  color: var(--accent-copper);
+  opacity: 0.7;
 }
 
 .settlement-item .from,
@@ -701,6 +738,10 @@ html, body {
   background: var(--bg-card);
   color: var(--text-secondary);
   border: 1px solid var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 .refresh-btn:hover {
@@ -798,6 +839,24 @@ html, body {
 .edit-form button:first-of-type {
   background: var(--success);
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-edit-btn {
+  background: var(--success) !important;
+  color: white !important;
+}
+
+.cancel-edit-btn {
+  background: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+}
+
+.cancel-edit-btn:hover {
+  background: var(--error) !important;
+  color: white !important;
 }
 
 .edit-form button:last-of-type {
