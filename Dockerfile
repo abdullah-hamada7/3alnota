@@ -24,9 +24,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Hugging Face Spaces requires running as user 1000
-RUN useradd -m -u 1000 user
-USER user
+# Use the built-in .NET 'app' user for security
+USER app
 
 # Environment variables
 ENV ASPNETCORE_URLS=http://+:8080
