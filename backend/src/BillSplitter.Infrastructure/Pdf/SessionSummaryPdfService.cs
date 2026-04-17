@@ -20,7 +20,8 @@ public class SessionSummaryPdfService : ISessionPdfService
             {
                 page.Size(PageSizes.A5);
                 page.Margin(30);
-                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("El Messiri"));
+                page.ContentFromRightToLeft();
 
                 page.Header().Element(c => ComposeHeader(c, summary));
                 page.Content().Element(c => ComposeContent(c, summary));

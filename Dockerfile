@@ -22,6 +22,19 @@ RUN dotnet publish "BillSplitter.Api.csproj" -c Release -o /app/publish /p:UseAp
 # Final stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
+
+# Install fontconfig and fonts for Arabic support
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fontconfig \
+    libfontconfig1 \
+    curl \
+    && mkdir -p /usr/share/fonts/truetype/elmessiri \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Regular.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Regular.ttf \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Medium.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Medium.ttf \
+    && curl -L https://github.com/google/fonts/raw/main/ofl/elmessiri/ElMessiri-Bold.ttf -o /usr/share/fonts/truetype/elmessiri/ElMessiri-Bold.ttf \
+    && fc-cache -f -v \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --from=publish /app/publish .
 
 # Use the built-in .NET 'app' user for security
